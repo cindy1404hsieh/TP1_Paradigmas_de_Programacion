@@ -1,5 +1,6 @@
 package org.example.vista;
 
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,6 +16,10 @@ public class Vista {
     private int LADO_CASILLA = 15;
 
     public Vista(Stage stage){
+        Label scoreLabel = new Label();
+        Label nivelLabel = new Label();
+        HBox menu = new HBox(new Label("score: "), scoreLabel, new Label("nivel: "), nivelLabel);
+        menu.setAlignment(Pos.CENTER);
         
         Button safeTeleportButton = new Button("Teleport Safely");
         HBox.setHgrow(safeTeleportButton, Priority.ALWAYS);
@@ -31,7 +36,7 @@ public class Vista {
         
         HBox layoutBotones = new HBox(safeTeleportButton, randomTeleportButton, waitButton);
         layoutBotones.setMaxHeight(Double.MAX_VALUE);
-        Scene scene = new Scene(new VBox(crearGrilla(), layoutBotones), COLUMNAS*LADO_CASILLA, FILAS*LADO_CASILLA + 40);
+        Scene scene = new Scene(new VBox(menu, crearGrilla(), layoutBotones), COLUMNAS*LADO_CASILLA, FILAS*LADO_CASILLA + 40);
         stage.setTitle("Robots");
         stage.setResizable(false);
         stage.setScene(scene);
