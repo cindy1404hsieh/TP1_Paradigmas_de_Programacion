@@ -11,9 +11,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Vista {
-    public static int COLUMNAS = 40;
-    public static int FILAS = 30;
-    private int LADO_CASILLA = 15;
+    public static int COLUMNAS_DEFAULT = 40;
+    public static int FILAS_DEFAULT = 30;
 
     public Vista(Stage stage){
         Label scoreLabel = new Label();
@@ -36,30 +35,14 @@ public class Vista {
         
         HBox layoutBotones = new HBox(safeTeleportButton, randomTeleportButton, waitButton);
         layoutBotones.setMaxHeight(Double.MAX_VALUE);
-        Scene scene = new Scene(new VBox(menu, crearGrilla(), layoutBotones), COLUMNAS*LADO_CASILLA, FILAS*LADO_CASILLA + 40);
+        Grilla grilla = new Grilla(COLUMNAS_DEFAULT, FILAS_DEFAULT);
+        grilla.actualizarTamanio(60, 10);
+        Scene scene = new Scene(new VBox(menu, grilla, layoutBotones), grilla.getColumnas()*Grilla.LADO_CASILLA, grilla.getFilas()*Grilla.LADO_CASILLA + 40);
         stage.setTitle("Robots");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
 
-    private TilePane crearGrilla(){
-        TilePane grilla = new TilePane();
-        grilla.setPrefColumns(COLUMNAS);
-        grilla.setPrefRows(FILAS);
-        boolean colorGrilla = true;
-        grilla.setMaxSize(COLUMNAS*LADO_CASILLA, FILAS*LADO_CASILLA);
-        for (int i = 0; i < FILAS; i++) {
-            // si la cantidad de columnas es impar, una fila empieza y termina con el mismo color.
-            // en ese caso actualizo el valor de colorGrilla
-            colorGrilla = !(COLUMNAS % 2 == 0) == colorGrilla;
-            for (int j = 0; j < COLUMNAS; j++) {
-                Color color = (colorGrilla) ? Color.LIGHTBLUE : Color.BLUE;
-                grilla.getChildren().add(new Rectangle(LADO_CASILLA, LADO_CASILLA, color));
-                colorGrilla = !colorGrilla;
 
-            }
-        }
-        return grilla;
-    }
 }
