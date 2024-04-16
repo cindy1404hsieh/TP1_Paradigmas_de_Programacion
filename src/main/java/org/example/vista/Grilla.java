@@ -1,25 +1,23 @@
 package org.example.vista;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.util.Random;
 
 public class Grilla extends TilePane {
     public static final int LADO_CASILLA = 20;
     private int columnas;
     private int filas;
     private Casilla[][] matriz;
+    private Entidad jugador;
 
     Grilla(int columnas, int filas) {
         super();
         this.columnas = columnas;
         this.filas = filas;
         crearGrilla();
-        matriz[filas/2][columnas/2].agregarEntidad("jugador");
+        agregarEntidades();
     }
 
     private void crearGrilla(){
@@ -45,6 +43,20 @@ public class Grilla extends TilePane {
 
     }
 
+    public void agregarEntidades() {
+        agregarJugador();
+        Random rd = new Random();
+        for (int i = 0; i < 8; i++) {
+            int randX = rd.nextInt(columnas);
+            int randY = rd.nextInt(filas);
+            while (matriz[randY][randX].estaOcupada()) {
+                randX = rd.nextInt(columnas);
+                randY = rd.nextInt(filas);
+            }
+            matriz[randY][randX].agregarEntidad("robot1x");
+        }
+    }
+
     public void actualizarTamanio(int columnas, int filas) {
         this.columnas = columnas;
         this.filas = filas;
@@ -63,6 +75,10 @@ public class Grilla extends TilePane {
 
     public Casilla obtenerCasilla(int x, int y) {
         return matriz[x][y];
+    }
+
+    private void agregarJugador() {
+        matriz[filas/2][columnas/2].agregarEntidad("jugador");
     }
 
 }

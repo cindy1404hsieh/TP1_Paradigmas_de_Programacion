@@ -27,4 +27,9 @@ public class Casilla extends StackPane {
         ocupada = true;
     }
 
+    public void eliminarEntidad() {
+        super.getChildren().clear();
+        ocupada = false;
+    }
+
 }
