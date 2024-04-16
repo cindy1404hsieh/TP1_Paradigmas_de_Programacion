@@ -1,18 +1,19 @@
 package org.example.vista;
 
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 public class Vista {
-    public static int COLUMNAS_DEFAULT = 40;
-    public static int FILAS_DEFAULT = 30;
+    public static int COLUMNAS_DEFAULT = 20;
+    public static int FILAS_DEFAULT = 15;
 
     public Vista(Stage stage){
         Label scoreLabel = new Label();
@@ -32,11 +33,11 @@ public class Vista {
         HBox.setHgrow(waitButton, Priority.ALWAYS);
         waitButton.setMaxWidth(Double.MAX_VALUE);
 
+
         
         HBox layoutBotones = new HBox(safeTeleportButton, randomTeleportButton, waitButton);
-        layoutBotones.setMaxHeight(Double.MAX_VALUE);
+        layoutBotones.setPrefHeight(Double.MAX_VALUE);
         Grilla grilla = new Grilla(COLUMNAS_DEFAULT, FILAS_DEFAULT);
-        grilla.actualizarTamanio(60, 10);
         Scene scene = new Scene(new VBox(menu, grilla, layoutBotones), grilla.getColumnas()*Grilla.LADO_CASILLA, grilla.getFilas()*Grilla.LADO_CASILLA + 40);
         stage.setTitle("Robots");
         stage.setResizable(false);
