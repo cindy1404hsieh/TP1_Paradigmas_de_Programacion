@@ -2,29 +2,35 @@ package org.example.vista;
 
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
+import org.example.modelo.Coordenada;
+import org.example.modelo.Robot;
+import org.example.modelo.Tablero;
 
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
 public class Grilla extends TilePane {
     public static final int LADO_CASILLA = 20;
-    private int columnas;
-    private int filas;
-    private Casilla[][] matriz;
-    private Entidad jugador;
+    private final Tablero tablero;
+    private final Casilla[][] casillas;
 
-    Grilla(int columnas, int filas) {
+    public Grilla(Tablero tablero) {
         super();
-        this.columnas = columnas;
-        this.filas = filas;
-        crearGrilla();
-        agregarEntidades();
+
+        this.tablero = tablero;
+        this.casillas = new Casilla[tablero.getFilas()][tablero.getColumnas()];
+        dibujarGrilla();
+        dibujarEntidades();
     }
 
-    private void crearGrilla(){
+    private void dibujarGrilla(){
+        int columnas = tablero.getColumnas();
+        int filas = tablero.getFilas();
         super.setPrefColumns(columnas);
         super.setPrefRows(filas);
 
-        matriz = new Casilla[filas][columnas];
         boolean colorGrilla = true;
         super.setMaxSize(columnas*LADO_CASILLA, filas*LADO_CASILLA);
 
@@ -33,8 +39,8 @@ public class Grilla extends TilePane {
             colorGrilla = (columnas % 2 != 0) == colorGrilla;
             for (int j = 0; j < columnas; j++) {
                 Color color = (colorGrilla) ? Color.LIGHTBLUE : Color.BLUE;
-                Casilla nuevaCasilla = new Casilla(i, j, color);
-                matriz[i][j] = nuevaCasilla;
+                Casilla nuevaCasilla = new Casilla(color);
+                casillas[i][j] = nuevaCasilla;
                 super.getChildren().add(nuevaCasilla);
                 colorGrilla = !colorGrilla;
 
@@ -43,42 +49,23 @@ public class Grilla extends TilePane {
 
     }
 
-    public void agregarEntidades() {
-        agregarJugador();
-        Random rd = new Random();
-        for (int i = 0; i < 8; i++) {
-            int randX = rd.nextInt(columnas);
-            int randY = rd.nextInt(filas);
-            while (matriz[randY][randX].estaOcupada()) {
-                randX = rd.nextInt(columnas);
-                randY = rd.nextInt(filas);
-            }
-            matriz[randY][randX].agregarEntidad("robot1x");
+    public void dibujarEntidades() {
+
+        Casilla casillaJugador = obtenerCasilla(tablero.getJugador().getPosicion());
+        casillaJugador.agregarEntidad("jugador");
+
+        for (Robot robot : tablero.getRobots()) {
+            Casilla casillaRobot = obtenerCasilla(robot.getPosicion());
+            casillaRobot.agregarEntidad("robot1x");
+            System.out.println(1);
         }
     }
 
-    public void actualizarTamanio(int columnas, int filas) {
-        this.columnas = columnas;
-        this.filas = filas;
-
-        super.getChildren().clear();
-        crearGrilla();
+    private Casilla obtenerCasilla(Coordenada coordenada) {
+        int i = coordenada.getFila();
+        int j = coordenada.getColumna();
+        return casillas[i][j];
     }
 
-    public int getColumnas() {
-        return columnas;
-    }
-
-    public int getFilas() {
-        return filas;
-    }
-
-    public Casilla obtenerCasilla(int x, int y) {
-        return matriz[x][y];
-    }
-
-    private void agregarJugador() {
-        matriz[filas/2][columnas/2].agregarEntidad("jugador");
-    }
 
 }

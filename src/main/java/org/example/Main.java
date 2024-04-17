@@ -1,9 +1,8 @@
 package org.example;
 
-import org.example.modelo.Coordenada;
-import org.example.modelo.Direccion;
-import org.example.modelo.Jugador;
-import org.example.modelo.Tablero;
+import org.example.modelo.*;
+
+import java.util.List;
 import java.util.Scanner;
 
 //solo lo implemente para visualizar el flujo del juego, aca creo que es donde va la vista,
@@ -19,6 +18,10 @@ public class Main {
         Coordenada coordenada = new Coordenada(FILA_INICIAL, COLUMNA_INICIAL);
         Tablero tablero = new Tablero(coordenada, 1);
         Jugador jugador = tablero.getJugador();
+        List<Robot> r = tablero.getRobots();
+        for (Robot ignored : r) {
+            System.out.println("hola");
+        }
 
         while (true) {
             try {

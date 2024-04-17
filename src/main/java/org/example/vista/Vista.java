@@ -6,8 +6,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.example.modelo.Coordenada;
+import org.example.modelo.Tablero;
 
 public class Vista {
     public static int COLUMNAS_DEFAULT = 20;
@@ -40,9 +43,10 @@ public class Vista {
 
         HBox layoutBotones = new HBox(safeTeleportButton, randomTeleportButton, waitButton);
         layoutBotones.setPrefHeight(Double.MAX_VALUE);
-        Grilla grilla = new Grilla(COLUMNAS_DEFAULT, FILAS_DEFAULT);
-
-        Scene scene = new Scene(new VBox(menu, grilla, layoutBotones), grilla.getColumnas()*Grilla.LADO_CASILLA, grilla.getFilas()*Grilla.LADO_CASILLA + 40);
+        Tablero t = new Tablero(new Coordenada(10, 10), 1);
+        Grilla grilla = new Grilla(t);
+        Scene scene = new Scene(grilla);
+        //Scene scene = new Scene(new VBox(menu, grilla, layoutBotones), grilla.getColumnas()*Grilla.LADO_CASILLA, grilla.getFilas()*Grilla.LADO_CASILLA + 40);
         stage.setTitle("Robots");
         stage.setResizable(false);
         stage.setScene(scene);
