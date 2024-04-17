@@ -33,7 +33,9 @@ public class Vista {
         waitButton = new Button("Wait for robots");
         HBox.setHgrow(waitButton, Priority.ALWAYS);
         waitButton.setMaxWidth(Double.MAX_VALUE);
-
+        waitButton.setOnAction(e -> {
+            mostrarMenu();
+        });
 
 
         HBox layoutBotones = new HBox(safeTeleportButton, randomTeleportButton, waitButton);
@@ -59,4 +61,11 @@ public class Vista {
         waitButton.setOnAction(handle);
     }
 
+    private void mostrarMenu() {
+        Stage stage = new Stage();
+        VBox root = new VBox(new Label("Hola"));
+        Scene scene = new Scene(root, 20, 20);
+        stage.setScene(scene);
+        stage.show();
+    }
 }
