@@ -116,8 +116,7 @@ public class Tablero {
     y de eliminar los robots que pisen estas celdas.*/
     public void actualizarCeldasIncendiadas() {
         for (Coordenada incendiada : celdasIncendiadas) {
-            Celda celda = getCelda(incendiada);
-            robots.removeIf(robot -> robot.getPosicion().equals(celda.getPosicion()));
+            eliminarRobotsEnCoordenada(incendiada);
         }
     }
     /*verifica si hay colisiones entre robots que ocupan la misma posición en el tablero.
@@ -131,11 +130,15 @@ public class Tablero {
             Coordenada pos = robot.getPosicion();
             if (!ocupadas.add(pos)) { // Si no se puede añadir, significa que ya estaba ocupada
                 incendiarCelda(pos);
-                robots.removeIf(r -> r.getPosicion().equals(pos));
+                eliminarRobotsEnCoordenada(pos);
                 huboColision = true;
             }
         }
         return huboColision;
+    }
+    /*Elimina todos los robots que se encuentran en la coordenada especificada.*/
+    private void eliminarRobotsEnCoordenada(Coordenada coordenada) {
+        robots.removeIf(robot -> robot.getPosicion().equals(coordenada));
     }
     public void setCeldaEstado(Coordenada coordenada, Celda.Estado estado) {
         if (esCeldaValida(coordenada)) {
