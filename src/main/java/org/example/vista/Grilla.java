@@ -28,18 +28,20 @@ public class Grilla extends TilePane {
 
         super.addEventHandler(SafeTeleportEvent.SAFE_TELEPORT, e -> {
             modoEspera = true;
-            e.consume();
         });
 
         super.addEventHandler(CeldaSeleccionadaEvent.CELDA_SELECCIONADA, e -> {
+            System.out.println("chau");
             this.update(new ActionSafeTeleport(casillaSeleccionada));
-            e.consume();
         });
 
         dibujarGrilla();
         dibujarEntidades();
     }
 
+    /**
+     * Crea una grilla del tamaño del tablero.
+     */
     private void dibujarGrilla(){
         int columnas = tablero.getColumnas();
         int filas = tablero.getFilas();
@@ -60,9 +62,10 @@ public class Grilla extends TilePane {
                 nuevaCasilla.setOnMouseClicked(mouseEvent -> {
                     if (modoEspera) {
                         modoEspera = false;
+                        this.casillaSeleccionada = new Coordenada(tmpI, tmpJ);
+                        System.out.printf("nueva posicion: %d %d", tmpI, tmpJ);
                         this.fireEvent(new CeldaSeleccionadaEvent());
                     }
-                    this.casillaSeleccionada = new Coordenada(tmpI, tmpJ);
                 });
                 casillas[i][j] = nuevaCasilla;
                 super.getChildren().add(nuevaCasilla);
@@ -73,8 +76,12 @@ public class Grilla extends TilePane {
 
     }
 
+    /**
+     * aplica la accion que recibe y vuelve a cargar las entidades.
+     */
     public void update(Action action) {
         if (modoEspera) {
+            System.out.println("no");
             return;
         }
         action.apply(tablero);
@@ -98,7 +105,13 @@ public class Grilla extends TilePane {
 
         for (Robot robot : tablero.getRobots()) {
             Casilla casillaRobot = obtenerCasilla(robot.getPosicion());
-            casillaRobot.agregarEntidad("robot1x");
+            casillaRobot.agregarEntidad(robot.getTipo());
+        }
+
+        for (Coordenada celda : tablero.getCeldasIncendiadas()) {
+            Casilla casilla = obtenerCasilla(celda);
+            casilla.agregarEntidad("explosion");
+
         }
     }
 
@@ -113,15 +126,14 @@ public class Grilla extends TilePane {
         }
     }
 
-    /*Devuelve la casilla que refieren las coordenadas.*/
+    /**
+     * Devuelve la casilla que refieren las coordenadas.
+     */
     private Casilla obtenerCasilla(Coordenada coordenada) {
         int i = coordenada.getFila();
         int j = coordenada.getColumna();
         return casillas[i][j];
     }
 
-    public Coordenada getCasillaSeleccionada() {
-        return casillaSeleccionada;
-    }
 }
 

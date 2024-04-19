@@ -53,20 +53,19 @@ public class Jugador {
     }
     /*Teletransporta al jugador a una posición aleatoria válida en el tablero.*/
     public void teletransportarse(Tablero tablero) {
-        if (teletransportacionesDisponibles > 0) {
-            int nuevaFila = (int) (Math.random() * tablero.getFilas());
-            int nuevaColumna = (int) (Math.random() * tablero.getColumnas());
+        int nuevaFila = (int) (Math.random() * tablero.getFilas());
+        int nuevaColumna = (int) (Math.random() * tablero.getColumnas());
 
-            Coordenada nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
+        Coordenada nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
 
-            while (!tablero.esCeldaValida(nuevaPosicion)) {
-                nuevaFila = (int) (Math.random() * tablero.getFilas());
-                nuevaColumna = (int) (Math.random() * tablero.getColumnas());
-                nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
-            }
-
-            setPosicion(nuevaPosicion);
+        while (!tablero.esCeldaValida(nuevaPosicion)) {
+            nuevaFila = (int) (Math.random() * tablero.getFilas());
+            nuevaColumna = (int) (Math.random() * tablero.getColumnas());
+            nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
         }
+
+        setPosicion(nuevaPosicion);
+
     }
     /*Teletransporta al jugador a una posición específica si es válida,
     está libre y quedan teletransportaciones disponibles.*/

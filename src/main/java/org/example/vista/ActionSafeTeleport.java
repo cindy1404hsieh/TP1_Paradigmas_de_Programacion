@@ -5,8 +5,6 @@ import javafx.event.EventType;
 import org.example.modelo.Coordenada;
 import org.example.modelo.Tablero;
 
-import java.util.concurrent.TransferQueue;
-
 public class ActionSafeTeleport implements Action{
     private final Coordenada coordenada;
 
