@@ -1,13 +1,11 @@
 package org.example.modelo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tablero {
     private final Celda[][] celdas;
     private final List<Robot> robots;
+    private List<Coordenada> celdasIncendiadas;
     private final Jugador jugador;
     private int nivelActual;
     public Tablero(Coordenada dimensiones, int nivelInicial) {
@@ -17,6 +15,7 @@ public class Tablero {
         int columnaJugador = dimensiones.getColumna() / 2;
         Coordenada coordenadaJugador = new Coordenada(filaJugador, columnaJugador);
         this.jugador = new Jugador(coordenadaJugador);
+        celdasIncendiadas = new ArrayList<>();
         this.nivelActual = nivelInicial; // Inicializa el nivel con el valor proporcionado
         inicializar(nivelInicial); // Llama a inicializar pasando el nivel inicial
     }
@@ -59,7 +58,7 @@ public class Tablero {
                 robots.add(new Robot2x(coordenadaRobot));
             }
 
-            celdas[coordenadaRobot.getFila()][coordenadaRobot.getColumna()].setEstado(Celda.Estado.OCUPADA);
+            setCeldaEstado(coordenadaRobot, Celda.Estado.OCUPADA);
         }
     }
     /*Genera una coordenada aleatoria en el tablero
@@ -72,46 +71,15 @@ public class Tablero {
         } while (fila == jugador.getPosicion().getFila() && columna == jugador.getPosicion().getColumna());
         return new Coordenada(fila, columna);
     }
-    /*Mueve cada robot en el tablero. Si un robot se mueve a una celda libre,
-    actualiza el estado de la celda a OCUPADA.*/
+    /*mueve cada robot en el tablero, actualiza las celdas de LIBRE a OCUPADA
+    según la nueva posición válida del robot y ajusta la posición del robot..*/
     public void moverRobots() {
         for (Robot robot : robots) {
             Coordenada nuevaPosicion = robot.mover(this);
             if (esCeldaValida(nuevaPosicion)) {
-                Celda nuevaCelda = getCelda(nuevaPosicion);
-                nuevaCelda.setEstado(Celda.Estado.OCUPADA);
-                celdas[robot.getPosicion().getFila()][robot.getPosicion().getColumna()].setEstado(Celda.Estado.LIBRE);
+                setCeldaEstado(nuevaPosicion, Celda.Estado.OCUPADA);
+                setCeldaEstado(robot.getPosicion(), Celda.Estado.LIBRE);
                 robot.setPosicion(nuevaPosicion);
-            }
-        }
-    }
-    /*Verifica si hay colisiones entre robots en el
-    mismo lugar y maneja las consecuencias de tales colisiones*/
-    public boolean verificarColisiones() {
-        boolean huboColision = false;
-        Map<Coordenada, List<Robot>> posiciones = new HashMap<>();
-        for (Robot robot : robots) {
-            posiciones.computeIfAbsent(robot.getPosicion(), k -> new ArrayList<>()).add(robot);
-        }
-
-        for (Map.Entry<Coordenada, List<Robot>> entrada : posiciones.entrySet()) {
-            if (entrada.getValue().size() > 1) {
-                robots.removeAll(entrada.getValue()); // elimina todos los robots en la misma celda
-                getCelda(entrada.getKey()).setEstado(Celda.Estado.INCENDIADA); // incendia la celda
-                huboColision = true;
-            }
-        }
-        return huboColision;
-    }
-    /*se encarga de actualizar el estado de las celdas incendiadas
-    y de eliminar los robots que pisen estas celdas.*/
-    public void actualizarCeldasIncendiadas() {
-        for (Celda[] fila : celdas) {
-            for (Celda celda : fila) {
-                if (celda.isIncendiada()) {
-                    // Elimina cualquier robot que pise una celda incendiada
-                    robots.removeIf(robot -> robot.getPosicion().equals(celda.getPosicion()));
-                }
             }
         }
     }
@@ -134,6 +102,48 @@ public class Tablero {
             }
         }
         return jugadorEstaVivo;
+    }
+    public void incendiarCelda(Coordenada coordenada) {
+        if (esCeldaValida(coordenada)) {
+            setCeldaEstado(coordenada, Celda.Estado.INCENDIADA);
+            celdasIncendiadas.add(coordenada);
+        }
+    }
+    public List<Coordenada> getCeldasIncendiadas() {
+        return celdasIncendiadas;
+    }
+    /*se encarga de actualizar el estado de las celdas incendiadas
+    y de eliminar los robots que pisen estas celdas.*/
+    public void actualizarCeldasIncendiadas() {
+        for (Coordenada incendiada : celdasIncendiadas) {
+            eliminarRobotsEnCoordenada(incendiada);
+        }
+    }
+    /*verifica si hay colisiones entre robots que ocupan la misma posición en el tablero.
+    Si se detecta una colisión en una posición,
+    esa celda se incendia y todos los robots en esa posición son eliminados.*/
+    public boolean verificarColisiones() {
+        Set<Coordenada> ocupadas = new HashSet<>();
+        boolean huboColision = false;
+
+        for (Robot robot : robots) {
+            Coordenada pos = robot.getPosicion();
+            if (!ocupadas.add(pos)) { // Si no se puede añadir, significa que ya estaba ocupada
+                incendiarCelda(pos);
+                eliminarRobotsEnCoordenada(pos);
+                huboColision = true;
+            }
+        }
+        return huboColision;
+    }
+    /*Elimina todos los robots que se encuentran en la coordenada especificada.*/
+    private void eliminarRobotsEnCoordenada(Coordenada coordenada) {
+        robots.removeIf(robot -> robot.getPosicion().equals(coordenada));
+    }
+    public void setCeldaEstado(Coordenada coordenada, Celda.Estado estado) {
+        if (esCeldaValida(coordenada)) {
+            getCelda(coordenada).setEstado(estado);
+        }
     }
     /*Verifica si una coordenada está dentro de los límites del tablero.*/
     public boolean esCeldaValida(Coordenada coordenada) {
