@@ -1,23 +1,29 @@
 package org.example.vista;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.animation.AnimationTimer;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.example.modelo.Coordenada;
+import org.example.modelo.Direccion;
 import org.example.modelo.Tablero;
 
+import java.util.*;
+
 public class Vista {
-    public static int COLUMNAS_DEFAULT = 20;
-    public static int FILAS_DEFAULT = 15;
-    public final Button safeTeleportButton;
-    public final Button randomTeleportButton;
-    public final Button waitButton;
+    final Map<KeyCode, Action> controles = Map.of(
+            KeyCode.A, new ActionMover(Direccion.IZQUIERDA),
+            KeyCode.D, new ActionMover(Direccion.DERECHA),
+            KeyCode.W, new ActionMover(Direccion.ARRIBA),
+            KeyCode.S, new ActionMover(Direccion.ABAJO)
+    );
+
 
     public Vista(Stage stage){
         Label scoreLabel = new Label();
@@ -25,44 +31,59 @@ public class Vista {
         HBox menu = new HBox(new Label("score: "), scoreLabel, new Label("nivel: "), nivelLabel);
         menu.setAlignment(Pos.CENTER);
 
-        safeTeleportButton = new Button("Teleport Safely");
-        HBox.setHgrow(safeTeleportButton, Priority.ALWAYS);
-        safeTeleportButton.setMaxWidth(Double.MAX_VALUE);
-
-        randomTeleportButton = new Button("Teleport Randomly");
-        HBox.setHgrow(randomTeleportButton, Priority.ALWAYS);
-        randomTeleportButton.setMaxWidth(Double.MAX_VALUE);
-
-        waitButton = new Button("Wait for robots");
-        HBox.setHgrow(waitButton, Priority.ALWAYS);
-        waitButton.setMaxWidth(Double.MAX_VALUE);
-        waitButton.setOnAction(e -> {
-            mostrarMenu();
-        });
-
-
-        HBox layoutBotones = new HBox(safeTeleportButton, randomTeleportButton, waitButton);
-        layoutBotones.setPrefHeight(Double.MAX_VALUE);
-        Tablero t = new Tablero(new Coordenada(10, 10), 1);
-        Grilla grilla = new Grilla(t);
-        Scene scene = new Scene(grilla);
-        //Scene scene = new Scene(new VBox(menu, grilla, layoutBotones), grilla.getColumnas()*Grilla.LADO_CASILLA, grilla.getFilas()*Grilla.LADO_CASILLA + 40);
+        Tablero tablero = new Tablero(new Coordenada(10, 10), 1);
+        Grilla grilla = new Grilla(tablero);
+        HBox botones = obtenerBotones(tablero, grilla);
+        VBox root = new VBox(grilla, botones);
+        root.setAlignment(Pos.CENTER);
+        root.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        Scene scene = new Scene(root);
+        HashSet<KeyCode> teclaPresionada = new HashSet<>();
+        scene.setOnKeyPressed(keyEvent -> {teclaPresionada.add(keyEvent.getCode());});
+        new AnimationTimer() {
+            @Override
+            public void handle(long ignored) {
+                for (KeyCode keyCode : teclaPresionada) {
+                    Action action = controles.get(keyCode);
+                    if (action != null) {
+                        grilla.update(action);
+                    }
+                    teclaPresionada.remove(keyCode);
+                }
+            }
+        }.start();
         stage.setTitle("Robots");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
 
-    public void addSafeTeleportListener(EventHandler<ActionEvent> handle) {
-        safeTeleportButton.setOnAction(handle);
-    }
+    private HBox obtenerBotones(Tablero tablero, Grilla g) {
+        Button safeTeleportButton = new Button("Teleport Safely");
+        HBox.setHgrow(safeTeleportButton, Priority.ALWAYS);
+        safeTeleportButton.setMaxWidth(Double.MAX_VALUE);
 
-    public void addRandomTeleportListener(EventHandler<ActionEvent> handle) {
-        randomTeleportButton.setOnAction(handle);
-    }
+        safeTeleportButton.setOnAction(ignored -> {
+            g.fireEvent(new SafeTeleportEvent());
+        });
 
-    public void addWaitButtonListener(EventHandler<ActionEvent> handle) {
-        waitButton.setOnAction(handle);
+        Button randomTeleportButton = new Button("Teleport Randomly");
+        HBox.setHgrow(randomTeleportButton, Priority.ALWAYS);
+        randomTeleportButton.setMaxWidth(Double.MAX_VALUE);
+
+        randomTeleportButton.setOnAction(ignored -> {
+            g.update(new ActionTeleport());
+        });
+
+        Button waitButton = new Button("Wait for robots");
+        HBox.setHgrow(waitButton, Priority.ALWAYS);
+        waitButton.setMaxWidth(Double.MAX_VALUE);
+
+        waitButton.setOnAction(ignored -> {
+            g.update(new ActionEsperar());
+        });
+
+        return new HBox(safeTeleportButton, randomTeleportButton, waitButton);
     }
 
     private void mostrarMenu() {
@@ -72,4 +93,6 @@ public class Vista {
         stage.setScene(scene);
         stage.show();
     }
+
 }
+
