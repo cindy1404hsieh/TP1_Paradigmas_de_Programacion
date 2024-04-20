@@ -1,24 +1,21 @@
 package org.example.vista;
 
-import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import org.example.modelo.Coordenada;
+import org.example.modelo.Direccion;
 import org.example.modelo.Robot;
 import org.example.modelo.Tablero;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
 
 public class Grilla extends TilePane {
     public static final int LADO_CASILLA = 20;
     private final Tablero tablero;
     private final Casilla[][] casillas;
     private Coordenada casillaSeleccionada;
+    private Casilla casillaResaltada;
     private boolean modoEspera;
+    private Direccion siguienteDireccion;
 
     public Grilla(Tablero tablero) {
         super();
@@ -29,11 +26,14 @@ public class Grilla extends TilePane {
         super.addEventHandler(SafeTeleportEvent.SAFE_TELEPORT, e -> {
             modoEspera = true;
         });
-
+        super.setOnMouseClicked(mouseEvent -> {
+            update(new ActionMover(siguienteDireccion));
+            siguienteDireccion(mouseEvent);
+        });
         super.addEventHandler(CeldaSeleccionadaEvent.CELDA_SELECCIONADA, e -> {
-            System.out.println("chau");
             this.update(new ActionSafeTeleport(casillaSeleccionada));
         });
+        super.setOnMouseMoved(this::siguienteDireccion);
 
         dibujarGrilla();
         dibujarEntidades();
@@ -63,10 +63,10 @@ public class Grilla extends TilePane {
                     if (modoEspera) {
                         modoEspera = false;
                         this.casillaSeleccionada = new Coordenada(tmpI, tmpJ);
-                        System.out.printf("nueva posicion: %d %d", tmpI, tmpJ);
                         this.fireEvent(new CeldaSeleccionadaEvent());
                     }
                 });
+
                 casillas[i][j] = nuevaCasilla;
                 super.getChildren().add(nuevaCasilla);
                 colorGrilla = !colorGrilla;
@@ -88,11 +88,6 @@ public class Grilla extends TilePane {
         clear();
         dibujarEntidades();
 
-    }
-
-    public void update() {
-        clear();
-        dibujarEntidades();
     }
 
     /**
@@ -129,10 +124,71 @@ public class Grilla extends TilePane {
     /**
      * Devuelve la casilla que refieren las coordenadas.
      */
-    private Casilla obtenerCasilla(Coordenada coordenada) {
+    public Casilla obtenerCasilla(Coordenada coordenada) {
         int i = coordenada.getFila();
         int j = coordenada.getColumna();
         return casillas[i][j];
+    }
+
+    /**
+     *
+     * @param mouseEvent
+     */
+    private void siguienteDireccion(MouseEvent mouseEvent) {
+        if (casillaResaltada != null) casillaResaltada.desResaltar();
+        int playerX = tablero.getJugador().getPosicion().getColumna();
+        int playerY = tablero.getJugador().getPosicion().getFila();
+
+        int mouseX = (int) mouseEvent.getX();
+        int mouseY = (int) mouseEvent.getY();
+
+        int gridX = mouseX / Grilla.LADO_CASILLA;
+        int gridY = mouseY / Grilla.LADO_CASILLA;
+
+        int deltaX = gridX - playerX;
+        int deltaY = gridY - playerY;
+        Coordenada siguiente = new Coordenada(playerY, playerY);
+
+        if (deltaX != 0 && deltaY != 0 && Math.abs(deltaX) == Math.abs(deltaY)) {
+            // Movimiento diagonal
+            if (deltaX > 0 && deltaY > 0) {
+                siguiente.setFila(playerY+1); siguiente.setColumna(playerX+1);
+                siguienteDireccion = Direccion.ABAJO_DERECHA;
+            } else if (deltaX > 0) {
+                siguiente.setFila(playerY-1); siguiente.setColumna(playerX+1);
+                siguienteDireccion = Direccion.ARRIBA_DERECHA;
+            } else if (deltaY > 0) {
+                siguiente.setFila(playerY+1); siguiente.setColumna(playerX-1);
+                siguienteDireccion = Direccion.ABAJO_IZQUIERDA;
+            } else {
+                siguiente.setFila(playerY-1); siguiente.setColumna(playerX-1);
+                siguienteDireccion = Direccion.ARRIBA_IZQUIERDA;
+            }
+        } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Movimiento horizontal
+            if (deltaX > 0) {
+                siguiente.setFila(playerY); siguiente.setColumna(playerX+1);
+                siguienteDireccion = Direccion.DERECHA;
+            } else {
+                siguiente.setFila(playerY); siguiente.setColumna(playerX-1);
+                siguienteDireccion = Direccion.IZQUIERDA;
+            }
+        } else if (Math.abs(deltaY) > Math.abs(deltaX)){
+            // Movimiento vertical
+            if (deltaY > 0) {
+                siguiente.setFila(playerY+1); siguiente.setColumna(playerX);
+                siguienteDireccion = Direccion.ABAJO;
+            } else {
+                siguiente.setFila(playerY-1); siguiente.setColumna(playerX);
+                siguienteDireccion = Direccion.ARRIBA;
+            }
+        } else {
+            siguiente = tablero.getJugador().getPosicion();
+            siguienteDireccion = Direccion.PERMANECER;
+        }
+        casillaResaltada = obtenerCasilla(siguiente);
+        casillaResaltada.resaltar();
+
     }
 
 }

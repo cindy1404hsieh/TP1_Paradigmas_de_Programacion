@@ -5,9 +5,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 public class Casilla extends StackPane {
+    private final Color color;
+
     Casilla(Color color) {
         super();
-
+        this.color = color;
         super.setPrefSize(Grilla.LADO_CASILLA, Grilla.LADO_CASILLA);
         super.setMaxSize(Grilla.LADO_CASILLA, Grilla.LADO_CASILLA);
         super.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -21,4 +23,11 @@ public class Casilla extends StackPane {
         super.getChildren().clear();
     }
 
+    public void resaltar() {
+        super.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+
+    public void desResaltar() {
+        super.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
+    }
 }
