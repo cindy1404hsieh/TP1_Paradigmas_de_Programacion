@@ -42,8 +42,8 @@ public class Tablero {
     /*Coloca una cantidad de robots que depende del nivel del juego
     en posiciones aleatorias en el tablero.*/
     private void inicializarRobots(int nivel) {
-        int baseRobots = (celdas.length * celdas[0].length) / 3;//un tercio del total de celdas en el tablero
-        int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10); // a medida que el nivel aumenta, la cantidad de robots también aumenta de manera controlada
+        int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);//un tercio del total de celdas en el tablero
+        int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2); // a medida que el nivel aumenta, la cantidad de robots también aumenta de manera controlada
 
         for (int i = 0; i < cantidadRobots; i++) {
             Coordenada coordenadaRobot = generarCoordenadaAleatoria();
@@ -74,14 +74,23 @@ public class Tablero {
     /*mueve cada robot en el tablero, actualiza las celdas de LIBRE a OCUPADA
     según la nueva posición válida del robot y ajusta la posición del robot..*/
     public void moverRobots() {
+        // Primero, marca todas las celdas como libres antes de mover los robots
         for (Robot robot : robots) {
+            setCeldaEstado(robot.getPosicion(), Celda.Estado.LIBRE);
+        }
+
+        // Mueve cada robot y actualiza las celdas a ocupadas
+        for (Robot robot : robots) {
+            Coordenada posicionActual = robot.getPosicion();
             Coordenada nuevaPosicion = robot.mover(this);
             if (esCeldaValida(nuevaPosicion)) {
-                setCeldaEstado(nuevaPosicion, Celda.Estado.OCUPADA);
-                setCeldaEstado(robot.getPosicion(), Celda.Estado.LIBRE);
                 robot.setPosicion(nuevaPosicion);
             }
+            setCeldaEstado(robot.getPosicion(), Celda.Estado.OCUPADA);
         }
+
+        // Verifica colisiones después de mover todos los robots
+        verificarColisiones();
     }
     /*verifica si el jugador ha perdido el juego
     al pisar una celda incendiada o ser alcanzado por un robot.*/
@@ -118,14 +127,16 @@ public class Tablero {
     Si se detecta una colisión en una posición,
     esa celda se incendia y todos los robots en esa posición son eliminados.*/
     public boolean verificarColisiones() {
-        Set<Coordenada> ocupadas = new HashSet<>();
-        boolean huboColision = false;
-
+        Map<Coordenada, List<Robot>> posiciones = new HashMap<>();
         for (Robot robot : robots) {
-            Coordenada pos = robot.getPosicion();
-            if (!ocupadas.add(pos)) { // Si no se puede añadir, significa que ya estaba ocupada
-                incendiarCelda(pos);
-                eliminarRobotsEnCoordenada(pos);
+            posiciones.computeIfAbsent(robot.getPosicion(), k -> new ArrayList<>()).add(robot);
+        }
+
+        boolean huboColision = false;
+        for (Map.Entry<Coordenada, List<Robot>> entrada : posiciones.entrySet()) {
+            if (entrada.getValue().size() > 1) { // Más de un robot en la misma celda
+                incendiarCelda(entrada.getKey());
+                eliminarRobotsEnCoordenada(entrada.getKey());
                 huboColision = true;
             }
         }

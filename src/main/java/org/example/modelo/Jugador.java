@@ -73,6 +73,7 @@ public class Jugador {
         if (teletransportacionesDisponibles > 0 && tablero.esCeldaValida(destino) && tablero.getCelda(destino).isLibre()) {
             setPosicion(destino);
             teletransportacionesDisponibles--;
+
         }
     }
     /*Devuelve la posición actual del jugador.*/
