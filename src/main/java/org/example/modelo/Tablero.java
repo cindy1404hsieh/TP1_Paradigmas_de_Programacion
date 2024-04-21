@@ -103,12 +103,7 @@ public class Tablero {
         }
         return jugadorEstaVivo;
     }
-    public void incendiarCelda(Coordenada coordenada) {
-        if (esCeldaValida(coordenada)) {
-            setCeldaEstado(coordenada, Celda.Estado.INCENDIADA);
-            celdasIncendiadas.add(coordenada);
-        }
-    }
+
     public List<Coordenada> getCeldasIncendiadas() {
         return celdasIncendiadas;
     }
@@ -135,6 +130,12 @@ public class Tablero {
             }
         }
         return huboColision;
+    }
+    public void incendiarCelda(Coordenada coordenada) {
+        if (esCeldaValida(coordenada)) {
+            setCeldaEstado(coordenada, Celda.Estado.INCENDIADA);
+            celdasIncendiadas.add(coordenada);
+        }
     }
     /*Elimina todos los robots que se encuentran en la coordenada especificada.*/
     private void eliminarRobotsEnCoordenada(Coordenada coordenada) {
