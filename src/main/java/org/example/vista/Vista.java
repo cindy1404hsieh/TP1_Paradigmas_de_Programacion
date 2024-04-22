@@ -56,8 +56,38 @@ public class Vista {
         stage.setScene(scene);
         stage.show();
     }
-
     private void setMainLoop(Scene scene, Grilla grilla, Tablero tablero) {
+        HashSet<KeyCode> teclaPresionada = new HashSet<>();
+        scene.setOnKeyPressed(keyEvent -> teclaPresionada.add(keyEvent.getCode()));
+        scene.setOnKeyReleased(keyEvent -> teclaPresionada.remove(keyEvent.getCode()));
+
+        new AnimationTimer() {
+            private long lastUpdate = 0; // Tiempo desde la última actualización
+            @Override
+            public void handle(long now) {
+                if (tablero.jugadorSigueVivo()) {
+                    nivelLabel.setText("nivel: " + tablero.getNivelActual());
+                    safeTeleportRestante.setText("teletransportes restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
+
+                    // Limitar la actualización a cada 100 milisegundos
+                    if (now - lastUpdate >= 100_000_000) {
+                        HashSet<KeyCode> copiaTeclasPresionadas = new HashSet<>(teclaPresionada);
+                        for (KeyCode keyCode : copiaTeclasPresionadas) {
+                            Action action = controles.get(keyCode);
+                            if (action != null) {
+                                grilla.update(action);
+                            }
+                        }
+                        lastUpdate = now; // Actualizar el tiempo de la última actualización
+                    }
+                } else {
+                    System.out.println("Perdiste");
+                    this.stop(); // Detener el AnimationTimer si el jugador pierde
+                }
+            }
+        }.start();
+    }
+    /*private void setMainLoop(Scene scene, Grilla grilla, Tablero tablero) {
         HashSet<KeyCode> teclaPresionada = new HashSet<>();
         scene.setOnKeyPressed(keyEvent -> {teclaPresionada.add(keyEvent.getCode());});
         new AnimationTimer() {
@@ -78,7 +108,7 @@ public class Vista {
                 }
             }
         }.start();
-    }
+    }*/
 
     private HBox obtenerBotones(Grilla g) {
         Button safeTeleportButton = new Button("Teleport Safely");

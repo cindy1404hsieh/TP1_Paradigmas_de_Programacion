@@ -17,6 +17,24 @@ public abstract class Robot {
         Jugador jugador = tablero.getJugador();
         Coordenada posicionJugador = jugador.getPosicion();
         Coordenada posicionRobot = getPosicion();
+
+        int direccionFila = Integer.compare(posicionJugador.getFila(), posicionRobot.getFila());
+        int direccionColumna = Integer.compare(posicionJugador.getColumna(), posicionRobot.getColumna());
+
+        int nuevaFila = posicionRobot.getFila() + direccionFila * pasos;
+        int nuevaColumna = posicionRobot.getColumna() + direccionColumna * pasos;
+
+        Coordenada nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
+        if (tablero.esCeldaValida(nuevaPosicion)) {
+            setPosicion(nuevaPosicion);
+            tablero.verificarColisiones(); // Asegúrate de verificar colisiones después de mover cada robot
+        }
+        return nuevaPosicion;
+    }
+    /*public Coordenada moverHaciaJugador(Tablero tablero, int pasos) {
+        Jugador jugador = tablero.getJugador();
+        Coordenada posicionJugador = jugador.getPosicion();
+        Coordenada posicionRobot = getPosicion();
         //esto devuelve -1, 0, o 1 dependiendo de si la primera coordenada es menor, igual o mayor que la segunda
         int direccionFila = Integer.compare(posicionJugador.getFila(), posicionRobot.getFila());
         int direccionColumna = Integer.compare(posicionJugador.getColumna(), posicionRobot.getColumna());
@@ -25,7 +43,7 @@ public abstract class Robot {
         int nuevaColumna = posicionRobot.getColumna() + direccionColumna * pasos;
 
         return new Coordenada(nuevaFila, nuevaColumna);
-    }
+    }*/
     /*Devuelve la posición actual del robot.*/
     public Coordenada getPosicion() {
         return posicion;

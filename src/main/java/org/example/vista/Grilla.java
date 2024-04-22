@@ -80,6 +80,12 @@ public class Grilla extends TilePane {
      * aplica la accion que recibe y vuelve a cargar las entidades.
      */
     public void update(Action action) {
+        action.apply(tablero);
+        tablero.verificarColisiones();  // Asegúrate de que esta línea esté presente
+        clear();
+        dibujarEntidades();
+    }
+ /*   public void update(Action action) {
         if (modoEspera) {
             System.out.println("no");
             return;
@@ -88,7 +94,7 @@ public class Grilla extends TilePane {
         clear();
         dibujarEntidades();
 
-    }
+    }*/
 
     /**
      * Añade las imagenes necesarias a la grilla.

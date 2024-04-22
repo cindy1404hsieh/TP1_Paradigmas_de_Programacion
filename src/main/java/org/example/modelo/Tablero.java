@@ -91,6 +91,11 @@ public class Tablero {
 
         // Verifica colisiones después de mover todos los robots
         verificarColisiones();
+        if (!jugadorSigueVivo()) {
+
+        }
+
+
     }
     /*verifica si el jugador ha perdido el juego
     al pisar una celda incendiada o ser alcanzado por un robot.*/
