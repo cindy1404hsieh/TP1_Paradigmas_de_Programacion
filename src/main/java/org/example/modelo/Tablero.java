@@ -5,10 +5,9 @@ import java.util.*;
 public class Tablero {
     private final Celda[][] celdas;
     private final List<Robot> robots;
-    private List<Celda> celdasIncendiadas;
+    private List<Coordenada> celdasIncendiadas;
     private final Jugador jugador;
     private int nivelActual;
-
     public Tablero(Coordenada dimensiones, int nivelInicial) {
         this.celdas = new Celda[dimensiones.getFila()][dimensiones.getColumna()];
         this.robots = new ArrayList<>();
@@ -20,7 +19,6 @@ public class Tablero {
         this.nivelActual = nivelInicial; // Inicializa el nivel con el valor proporcionado
         inicializar(nivelInicial); // Llama a inicializar pasando el nivel inicial
     }
-
     /*Incrementa el nivel del juego
     y reinicializa el tablero y los robots para el nuevo nivel.*/
     public void siguienteNivel() {
@@ -29,7 +27,6 @@ public class Tablero {
         int teletransportacionesDisponibles = jugador.getTeletransportacionesDisponibles();
         jugador.setTeletransportacionesDisponibles(teletransportacionesDisponibles+1);
     }
-
     /* Prepara el tablero para el juego al establecer todas las celdas a LIBRE
     y coloca robots en posiciones aleatorias.*/
     public void inicializar(int nivel) {
@@ -42,7 +39,6 @@ public class Tablero {
         }
         inicializarRobots(nivel);
     }
-
     /*Coloca una cantidad de robots que depende del nivel del juego
     en posiciones aleatorias en el tablero.*/
     private void inicializarRobots(int nivel) {
@@ -65,7 +61,6 @@ public class Tablero {
             setCeldaEstado(coordenadaRobot, Celda.Estado.OCUPADA);
         }
     }
-
     /*Genera una coordenada aleatoria en el tablero
     que no sea la posición actual del jugador.*/
     private Coordenada generarCoordenadaAleatoria() {
@@ -76,7 +71,6 @@ public class Tablero {
         } while (fila == jugador.getPosicion().getFila() && columna == jugador.getPosicion().getColumna());
         return new Coordenada(fila, columna);
     }
-
     /*mueve cada robot en el tablero, actualiza las celdas de LIBRE a OCUPADA
     según la nueva posición válida del robot y ajusta la posición del robot..*/
     public void moverRobots() {
@@ -97,9 +91,7 @@ public class Tablero {
 
         // Verifica colisiones después de mover todos los robots
         verificarColisiones();
-        actualizarCeldasIncendiadas();
     }
-
     /*verifica si el jugador ha perdido el juego
     al pisar una celda incendiada o ser alcanzado por un robot.*/
     public boolean jugadorSigueVivo() {
@@ -121,58 +113,54 @@ public class Tablero {
         return jugadorEstaVivo;
     }
 
-    public List<Celda> getCeldasIncendiadas() {
+    public List<Coordenada> getCeldasIncendiadas() {
         return celdasIncendiadas;
     }
-
     /*se encarga de actualizar el estado de las celdas incendiadas
     y de eliminar los robots que pisen estas celdas.*/
     public void actualizarCeldasIncendiadas() {
-        for (Celda incendiada : celdasIncendiadas) {
-            eliminarRobotsEnCelda(incendiada);
+        for (Coordenada incendiada : celdasIncendiadas) {
+            eliminarRobotsEnCoordenada(incendiada);
         }
     }
-
     /*verifica si hay colisiones entre robots que ocupan la misma posición en el tablero.
     Si se detecta una colisión en una posición,
     esa celda se incendia y todos los robots en esa posición son eliminados.*/
-    public void verificarColisiones() {
-        Map<Celda, List<Robot>> posiciones = new HashMap<>();
+    public boolean verificarColisiones() {
+        Map<Coordenada, List<Robot>> posiciones = new HashMap<>();
         for (Robot robot : robots) {
-            posiciones.computeIfAbsent(getCelda(robot.getPosicion()), k -> new ArrayList<>()).add(robot);
+            posiciones.computeIfAbsent(robot.getPosicion(), k -> new ArrayList<>()).add(robot);
         }
 
-        for (Map.Entry<Celda, List<Robot>> entrada : posiciones.entrySet()) {
+        boolean huboColision = false;
+        for (Map.Entry<Coordenada, List<Robot>> entrada : posiciones.entrySet()) {
             if (entrada.getValue().size() > 1) { // Más de un robot en la misma celda
                 incendiarCelda(entrada.getKey());
-                eliminarRobotsEnCelda(entrada.getKey());
+                eliminarRobotsEnCoordenada(entrada.getKey());
+                huboColision = true;
             }
         }
+        return huboColision;
     }
-
-    public void incendiarCelda(Celda celda) {
-        if (esCeldaValida(celda.getPosicion())) {
-            celda.setEstado(Celda.Estado.INCENDIADA);
-            celdasIncendiadas.add(celda);
+    public void incendiarCelda(Coordenada coordenada) {
+        if (esCeldaValida(coordenada)) {
+            setCeldaEstado(coordenada, Celda.Estado.INCENDIADA);
+            celdasIncendiadas.add(coordenada);
         }
     }
-
     /*Elimina todos los robots que se encuentran en la coordenada especificada.*/
-    private void eliminarRobotsEnCelda(Celda celda) {
-        robots.removeIf(robot -> getCelda(robot.getPosicion()).equals(celda));
+    private void eliminarRobotsEnCoordenada(Coordenada coordenada) {
+        robots.removeIf(robot -> robot.getPosicion().equals(coordenada));
     }
-
     public void setCeldaEstado(Coordenada coordenada, Celda.Estado estado) {
         if (esCeldaValida(coordenada)) {
             getCelda(coordenada).setEstado(estado);
         }
     }
-
     /*Verifica si una coordenada está dentro de los límites del tablero.*/
     public boolean esCeldaValida(Coordenada coordenada) {
         return coordenada.getFila() >= 0 && coordenada.getFila() < celdas.length && coordenada.getColumna() >= 0 && coordenada.getColumna() < celdas[0].length;
     }
-
     /*Devuelve la celda en la coordenada especificada si es válida.*/
     public Celda getCelda(Coordenada coordenada) {
         if (esCeldaValida(coordenada)) {
@@ -181,7 +169,6 @@ public class Tablero {
             return null;
         }
     }
-
     /*Devuelven las dimensiones del tablero.*/
     public int getFilas() {
         return celdas.length;
