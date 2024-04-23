@@ -16,6 +16,8 @@ public class ActionSafeTeleport implements Action{
     public void apply(Tablero tablero) {
         tablero.getJugador().teletransportarseSeguro(tablero, coordenada);
         tablero.moverRobots();
+        tablero.verificarColisiones();
+        tablero.actualizarCeldasIncendiadas();
     }
 }
 
