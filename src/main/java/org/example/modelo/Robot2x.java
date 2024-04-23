@@ -5,7 +5,7 @@ public class Robot2x extends Robot {
     public Robot2x(Coordenada posicion) {
         super(posicion);
     }
-    @Override
+
     public String getTipo() {
         return "Robot2x";
     }

@@ -33,9 +33,7 @@ public abstract class Robot {
     public void setPosicion(Coordenada nuevaPosicion) {
         posicion = nuevaPosicion;
     }
-    public String getTipo() {
-        return "Generico";
-    }
+    public abstract String getTipo();
 
 }
 
