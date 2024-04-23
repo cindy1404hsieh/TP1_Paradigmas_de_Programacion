@@ -7,8 +7,5 @@ public class ActionTeleport implements Action{
     public void apply(Tablero tablero) {
         tablero.getJugador().teletransportarse(tablero);
         tablero.moverRobots();
-        tablero.verificarColisiones();
-        tablero.actualizarCeldasIncendiadas();
-
     }
 }
