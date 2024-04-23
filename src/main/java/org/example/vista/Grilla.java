@@ -3,10 +3,7 @@ package org.example.vista;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
-import org.example.modelo.Coordenada;
-import org.example.modelo.Direccion;
-import org.example.modelo.Robot;
-import org.example.modelo.Tablero;
+import org.example.modelo.*;
 
 public class Grilla extends TilePane {
     public static final int LADO_CASILLA = 20;
@@ -103,8 +100,8 @@ public class Grilla extends TilePane {
             casillaRobot.agregarEntidad(robot.getTipo());
         }
 
-        for (Coordenada celda : tablero.getCeldasIncendiadas()) {
-            Casilla casilla = obtenerCasilla(celda);
+        for (Celda celda : tablero.getCeldasIncendiadas()) {
+            Casilla casilla = obtenerCasilla(celda.getPosicion());
             casilla.agregarEntidad("explosion");
 
         }
