@@ -76,6 +76,7 @@ public class Vista {
             @Override
             public void handle(long ignored) {
                 nivelLabel.setText("nivel: " + tablero.getNivelActual());
+                scoreLabel.setText("score: " + tablero.getScore());
                 safeTeleportRestante.setText("teletransportaciones restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
 
                 for (KeyCode keyCode : teclaPresionada) {

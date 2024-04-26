@@ -118,24 +118,22 @@ public class Tablero {
     /*verifica si el jugador ha perdido el juego
     al pisar una celda incendiada o ser alcanzado por un robot.*/
     public boolean jugadorSigueVivo() {
-        boolean jugadorEstaVivo = true;
         // Verifica si el jugador pisa una celda incendiada
         Celda celdaJugador = getCelda(jugador.getPosicion());
         if (celdaJugador != null && celdaJugador.isIncendiada()) {
             System.out.println("a");
             //El jugador ha perdido por pisar una celda incendiada
-            jugadorEstaVivo = false;
+             return false;
         }
 
         // Verifica si algún robot ha alcanzado al jugador
         for (Robot robot : robots) {
             if (getCelda(robot.getPosicion()) == celdaJugador) {
                 //El jugador ha perdido por ser alcanzado por un robot.
-                jugadorEstaVivo = false;
-                break;
+                return false;
             }
         }
-        return jugadorEstaVivo;
+        return true;
     }
 
     public List<Celda> getCeldasIncendiadas() {
@@ -161,6 +159,7 @@ public class Tablero {
 
         for (Map.Entry<Celda, List<Robot>> entrada : posiciones.entrySet()) {
             if (entrada.getValue().size() > 1) { // Más de un robot en la misma celda
+                score += entrada.getValue().size();
                 incendiarCelda(entrada.getKey());
                 eliminarRobotsEnCelda(entrada.getKey());
             }
@@ -220,4 +219,7 @@ public class Tablero {
         return nivelActual;
     }
 
+    public int getScore() {
+        return score;
+    }
 }
