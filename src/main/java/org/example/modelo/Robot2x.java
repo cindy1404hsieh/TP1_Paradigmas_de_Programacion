@@ -20,8 +20,7 @@ public class Robot2x extends Robot {
             if (tablero.esCeldaLibre(siguientePosicion)) {
                 setPosicion(siguientePosicion);
                 tablero.verificarColisiones();
-            } else {
-                break;
+                tablero.actualizarCeldasIncendiadas();
             }
         }
         return getPosicion();

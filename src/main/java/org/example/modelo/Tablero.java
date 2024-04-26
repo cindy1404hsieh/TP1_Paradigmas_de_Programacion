@@ -100,6 +100,8 @@ public class Tablero {
             if (esCeldaValida(nuevaPosicion)) {
                 robot.setPosicion(nuevaPosicion);
                 setCeldaEstado(robot.getPosicion(), Celda.Estado.OCUPADA);
+            }else {
+                iterator.remove();
             }
         }
         verificarColisiones();

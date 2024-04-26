@@ -77,7 +77,7 @@ public class Grilla extends TilePane {
             // si la cantidad de columnas es impar, una fila empieza y termina con el mismo color. En ese caso actualizo el valor de colorGrilla
             colorGrilla = (columnas % 2 != 0) == colorGrilla;
             for (int j = 0; j < columnas; j++) {
-                Color color = (colorGrilla) ? Color.LIGHTSTEELBLUE : Color.ROYALBLUE;
+                Color color = (colorGrilla) ? Color.LIGHTSTEELBLUE : Color.GAINSBORO;
                 Casilla nuevaCasilla = new Casilla(color);
                 int tmpI = i;
                 int tmpJ = j;

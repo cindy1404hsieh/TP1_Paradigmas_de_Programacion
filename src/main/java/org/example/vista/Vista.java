@@ -37,6 +37,7 @@ public class Vista {
     private Tablero tablero;
     private Grilla grilla;
 
+
     public Vista(Stage stage){
         tablero = new Tablero(new Coordenada(10, 10), 1);
         grilla = new Grilla(tablero);
@@ -50,7 +51,7 @@ public class Vista {
 
         VBox root = new VBox(layoutSuperior, grilla, botones, layoutInfo);
         root.setAlignment(Pos.CENTER);
-        root.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
+        root.setBackground(new Background(new BackgroundFill(Color.SILVER, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(root);
         Stage pantallaFinDeJuego = obtenerPantallaFinDeJuego(scene);
