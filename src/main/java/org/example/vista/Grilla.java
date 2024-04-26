@@ -164,7 +164,7 @@ public class Grilla extends TilePane {
     private void siguienteDireccion(MouseEvent mouseEvent) {
         if (modoTeleport) {
             mouseEvent.consume();
-            return; // No calcular dirección si está en modo teletransporte
+            return;
         }
         if (casillaResaltada != null) casillaResaltada.desResaltar();
         int playerX = tablero.getJugador().getPosicion().getColumna();
@@ -175,6 +175,9 @@ public class Grilla extends TilePane {
 
         int gridX = mouseX / LADO_CASILLA;
         int gridY = mouseY / LADO_CASILLA;
+
+        if (gridX >= tablero.getColumnas()) gridX = tablero.getColumnas() - 1;
+        if (gridY >= tablero.getFilas()) gridY = tablero.getFilas() - 1;
 
         int deltaX = gridX - playerX;
         int deltaY = gridY - playerY;
