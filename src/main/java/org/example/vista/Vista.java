@@ -50,7 +50,7 @@ public class Vista {
 
         VBox root = new VBox(layoutSuperior, grilla, botones, layoutInfo);
         root.setAlignment(Pos.CENTER);
-        root.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        root.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(root);
         Stage pantallaFinDeJuego = obtenerPantallaFinDeJuego(scene);
@@ -80,8 +80,8 @@ public class Vista {
         new AnimationTimer() {
             @Override
             public void handle(long ignored) {
-                nivelLabel.setText("nivel: " + tablero.getNivelActual());
-                safeTeleportRestante.setText("teletransportaciones restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
+                nivelLabel.setText("Nivel: " + tablero.getNivelActual());
+                safeTeleportRestante.setText("Teletransportaciones Restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
 
                 for (KeyCode keyCode : teclaPresionada) {
                     Action action = controles.get(keyCode);
@@ -126,8 +126,8 @@ public class Vista {
     public void cargarPantallaMenu(Event event) {
         TextField columnasTextfield = new TextField("10");
         TextField filasTextfield = new TextField("10");
-        HBox root = new HBox(new Label("columnas"), columnasTextfield, new Label("filas"), filasTextfield);
-        Button okButton = new Button("aceptar");
+        HBox root = new HBox(new Label("Columnas"), columnasTextfield, new Label("filas"), filasTextfield);
+        Button okButton = new Button("Aceptar");
         Stage menuStage = new Stage();
 
         okButton.setOnAction(ignored -> {
@@ -187,7 +187,7 @@ public class Vista {
         layoutLabels.setMaxWidth(Double.MAX_VALUE);
         layoutLabels.setAlignment(Pos.CENTER);
 
-        Button menuButton = new Button("menu");
+        Button menuButton = new Button("MENU");
         menuButton.setOnAction(this::cargarPantallaMenu);
 
         HBox layoutSuperior = new HBox(layoutLabels, menuButton);
