@@ -101,9 +101,12 @@ public class Vista {
 
         intentarDeNuevo.setOnAction(e -> {
             grilla.fireEvent(new ReiniciarJuegoEvent());
+            tablero.getJugador().setTeletransportacionesDisponibles(1);
             finDelJuegoStage.close();
         });
-
+        finDelJuegoStage.setOnCloseRequest(e -> {
+            System.exit(0);
+        });
         finDelJuegoStage.setScene(new Scene(new VBox(mensaje, intentarDeNuevo)));
         finDelJuegoStage.setTitle("Fin del Juego");
         finDelJuegoStage.initModality(Modality.WINDOW_MODAL);
