@@ -1,14 +1,18 @@
 package org.example.vista;
 
 import javafx.animation.AnimationTimer;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.modelo.Coordenada;
 import org.example.modelo.Direccion;
@@ -21,24 +25,23 @@ public class Vista {
             KeyCode.A, new ActionMover(Direccion.IZQUIERDA),
             KeyCode.D, new ActionMover(Direccion.DERECHA),
             KeyCode.W, new ActionMover(Direccion.ARRIBA),
-            KeyCode.S, new ActionMover(Direccion.ABAJO)
+            KeyCode.S, new ActionMover(Direccion.ABAJO),
+            KeyCode.Q, new ActionMover(Direccion.ARRIBA_IZQUIERDA),
+            KeyCode.E, new ActionMover(Direccion.ARRIBA_DERECHA),
+            KeyCode.Z, new ActionMover(Direccion.ABAJO_IZQUIERDA),
+            KeyCode.C, new ActionMover(Direccion.ABAJO_DERECHA)
     );
-//    private final Label scoreLabel;
-    private final Label nivelLabel;
+    private Label scoreLabel;
+    private Label nivelLabel;
     private final Label safeTeleportRestante;
-
+    private Tablero tablero;
+    private Grilla grilla;
 
     public Vista(Stage stage){
-        Label scoreLabel = new Label();
-        nivelLabel = new Label();
-        HBox layoutSuperior = new HBox(scoreLabel, nivelLabel);
-        layoutSuperior.setAlignment(Pos.CENTER);
-        layoutSuperior.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-        Tablero tablero = new Tablero(new Coordenada(10, 10), 1);
-        Grilla grilla = new Grilla(tablero);
-
-        HBox botones = obtenerBotones(grilla);
+        tablero = new Tablero(new Coordenada(10, 10), 1);
+        grilla = new Grilla(tablero);
+        HBox layoutSuperior = obtenerLayoutSuperior();
+        HBox botones = obtenerBotones();
 
         safeTeleportRestante = new Label();
         HBox layoutInfo = new HBox(safeTeleportRestante);
@@ -50,60 +53,139 @@ public class Vista {
         root.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(root);
-        setMainLoop(scene, grilla, tablero);
+        Stage pantallaFinDeJuego = obtenerPantallaFinDeJuego(scene);
+
+        grilla.addEventHandler(JugadorMurioEvent.JUGADOR_MURIO, e -> {
+            if (!pantallaFinDeJuego.isShowing()) pantallaFinDeJuego.show();
+        });
+
+        setMainLoop(scene);
         stage.setTitle("Robots");
-        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
-    private void setMainLoop(Scene scene, Grilla grilla, Tablero tablero) {
+
+    /**
+     * Inicializa el loop del juego.
+     */
+    private void setMainLoop(Scene scene) {
         HashSet<KeyCode> teclaPresionada = new HashSet<>();
         scene.setOnKeyPressed(keyEvent -> {teclaPresionada.add(keyEvent.getCode());});
+
         new AnimationTimer() {
             @Override
             public void handle(long ignored) {
-                if (tablero.jugadorSigueVivo()) {
-                    nivelLabel.setText("nivel: " + tablero.getNivelActual());
-                    safeTeleportRestante.setText("teletransportes restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
-                    for (KeyCode keyCode : teclaPresionada) {
-                        Action action = controles.get(keyCode);
-                        if (action != null) {
-                            grilla.update(action);
-                        }
-                        teclaPresionada.remove(keyCode);
-                    }
-                } else {
-                    System.out.println("Perdiste");
+                nivelLabel.setText("nivel: " + tablero.getNivelActual());
+                safeTeleportRestante.setText("teletransportaciones restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
+
+                for (KeyCode keyCode : teclaPresionada) {
+                    Action action = controles.get(keyCode);
+                    if (action != null) grilla.aplicarAccion(action);
+                    teclaPresionada.remove(keyCode);
                 }
+                if (!tablero.jugadorSigueVivo()) {
+                    grilla.fireEvent(new JugadorMurioEvent());
+                }
+                if (tablero.getRobots().isEmpty()) tablero.siguienteNivel();
             }
         }.start();
     }
 
+    /**
+     * Crea y carga una pantalla de fin de juego, con la opcion de reiniciar la partida.
+     */
+    private Stage obtenerPantallaFinDeJuego(Scene scene) {
+        Label mensaje = new Label("Perdiste el juego :(");
+        Button intentarDeNuevo = new Button("Intentar de nuevo?");
+        Stage finDelJuegoStage = new Stage();
 
+        intentarDeNuevo.setOnAction(e -> {
+            grilla.fireEvent(new ReiniciarJuegoEvent());
+            finDelJuegoStage.close();
+        });
 
-    private HBox obtenerBotones(Grilla g) {
+        finDelJuegoStage.setScene(new Scene(new VBox(mensaje, intentarDeNuevo)));
+        finDelJuegoStage.setTitle("Fin del Juego");
+        finDelJuegoStage.initModality(Modality.WINDOW_MODAL);
+        finDelJuegoStage.initOwner(scene.getWindow());
+        finDelJuegoStage.setResizable(false);
+        return finDelJuegoStage;
+    }
+
+    /**
+     * Crea y carga una pantalla aparte para configurar el tamaño de la grilla.
+     */
+    public void cargarPantallaMenu(Event event) {
+        TextField columnasTextfield = new TextField("10");
+        TextField filasTextfield = new TextField("10");
+        HBox root = new HBox(new Label("columnas"), columnasTextfield, new Label("filas"), filasTextfield);
+        Button okButton = new Button("aceptar");
+        Stage menuStage = new Stage();
+
+        okButton.setOnAction(ignored -> {
+            int columnas = Integer.parseInt(columnasTextfield.getText());
+            int filas = Integer.parseInt(filasTextfield.getText());
+            tablero.cambiarTamanio(new Coordenada(filas, columnas));
+            grilla.getChildren().clear();
+            grilla.dibujarGrilla();
+            grilla.dibujarEntidades();
+            menuStage.close();
+        });
+
+        menuStage.setScene(new Scene(new VBox(root, okButton)));
+        menuStage.setTitle("Ajustar tamaño");
+        menuStage.initModality(Modality.WINDOW_MODAL);
+        menuStage.initOwner(((Node)event.getSource()).getScene().getWindow());
+        menuStage.setResizable(false);
+        menuStage.show();
+    }
+
+    /**
+     * Devuelve la hilera de botones con sus funcionalidades inicializadas.
+     */
+    private HBox obtenerBotones() {
         Button safeTeleportButton = new Button("Teleport Safely");
         HBox.setHgrow(safeTeleportButton, Priority.ALWAYS);
         safeTeleportButton.setMaxWidth(Double.MAX_VALUE);
         safeTeleportButton.setOnAction(ignored -> {
-            g.fireEvent(new SafeTeleportEvent());
+            grilla.fireEvent(new SafeTeleportEvent());
         });
 
         Button randomTeleportButton = new Button("Teleport Randomly");
         HBox.setHgrow(randomTeleportButton, Priority.ALWAYS);
         randomTeleportButton.setMaxWidth(Double.MAX_VALUE);
         randomTeleportButton.setOnAction(ignored -> {
-            g.update(new ActionTeleport());
+            grilla.aplicarAccion(new ActionTeleport());
         });
 
         Button waitButton = new Button("Wait for robots");
         HBox.setHgrow(waitButton, Priority.ALWAYS);
         waitButton.setMaxWidth(Double.MAX_VALUE);
         waitButton.setOnAction(ignored -> {
-            g.update(new ActionEsperar());
+            grilla.update();
         });
 
         return new HBox(safeTeleportButton, randomTeleportButton, waitButton);
+    }
+
+    /**
+     * crea y devuelve la parte superior de la interfaz grafica.
+     */
+    private HBox obtenerLayoutSuperior() {
+        scoreLabel = new Label();
+        nivelLabel = new Label();
+        HBox layoutLabels = new HBox(scoreLabel, nivelLabel);
+        HBox.setHgrow(layoutLabels, Priority.ALWAYS);
+        layoutLabels.setMaxWidth(Double.MAX_VALUE);
+        layoutLabels.setAlignment(Pos.CENTER);
+
+        Button menuButton = new Button("menu");
+        menuButton.setOnAction(this::cargarPantallaMenu);
+
+        HBox layoutSuperior = new HBox(layoutLabels, menuButton);
+        layoutSuperior.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        return layoutSuperior;
     }
 
 }

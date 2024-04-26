@@ -19,18 +19,3 @@ public class ActionSafeTeleport implements Action{
     }
 }
 
-class SafeTeleportEvent extends Event {
-    public static final EventType<SafeTeleportEvent> SAFE_TELEPORT = new EventType<>("SAFE_TELEPORT");
-    public SafeTeleportEvent() {
-        super(SAFE_TELEPORT);
-    }
-}
-
-class CeldaSeleccionadaEvent extends Event {
-    public static final EventType<CeldaSeleccionadaEvent> CELDA_SELECCIONADA = new EventType<>("CELDA_SELECCIONADA");
-    public CeldaSeleccionadaEvent() {
-        super(CELDA_SELECCIONADA);
-    }
-
-}
-

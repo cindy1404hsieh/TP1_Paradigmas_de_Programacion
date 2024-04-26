@@ -13,6 +13,5 @@ public class ActionMover implements Action{
     @Override
     public void apply(Tablero tablero) {
         tablero.getJugador().mover(tablero, direccion);
-        tablero.moverRobots();
     }
 }

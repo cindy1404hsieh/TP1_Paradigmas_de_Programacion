@@ -1,13 +1,17 @@
 package org.example.modelo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Tablero {
-    private final Celda[][] celdas;
+    private Celda[][] celdas;
     private final List<Robot> robots;
     private List<Celda> celdasIncendiadas;
     private final Jugador jugador;
     private int nivelActual;
+    private int score;
 
     public Tablero(Coordenada dimensiones, int nivelInicial) {
         this.celdas = new Celda[dimensiones.getFila()][dimensiones.getColumna()];
@@ -21,10 +25,19 @@ public class Tablero {
         inicializar(nivelInicial); // Llama a inicializar pasando el nivel inicial
     }
 
+    /**
+     * cambia el tamaño del tablero y vuelve a cargar a los enemigos desde el nivel actual.
+     */
+    public void cambiarTamanio(Coordenada dimensiones) {
+        celdas = new Celda[dimensiones.getFila()][dimensiones.getColumna()];
+        inicializar(nivelActual);
+    }
+
     /*Incrementa el nivel del juego
     y reinicializa el tablero y los robots para el nuevo nivel.*/
     public void siguienteNivel() {
         nivelActual++;
+        celdasIncendiadas.clear();
         inicializar(nivelActual);
         int teletransportacionesDisponibles = jugador.getTeletransportacionesDisponibles();
         jugador.setTeletransportacionesDisponibles(teletransportacionesDisponibles+1);
@@ -33,11 +46,13 @@ public class Tablero {
     /* Prepara el tablero para el juego al establecer todas las celdas a LIBRE
     y coloca robots en posiciones aleatorias.*/
     public void inicializar(int nivel) {
+        robots.clear();
+        celdasIncendiadas.clear();
+        nivelActual = nivel;
+
         for (int fila = 0; fila < celdas.length; fila++) {
             for (int columna = 0; columna < celdas[fila].length; columna++) {
-                if (celdas[fila][columna] == null) {
-                    celdas[fila][columna] = new Celda(Celda.Estado.LIBRE, new Coordenada(fila, columna));
-                }
+                celdas[fila][columna] = new Celda(Celda.Estado.LIBRE, new Coordenada(fila, columna));
             }
         }
         inicializarRobots(nivel);
@@ -107,15 +122,17 @@ public class Tablero {
         // Verifica si el jugador pisa una celda incendiada
         Celda celdaJugador = getCelda(jugador.getPosicion());
         if (celdaJugador != null && celdaJugador.isIncendiada()) {
+            System.out.println("a");
             //El jugador ha perdido por pisar una celda incendiada
             jugadorEstaVivo = false;
         }
 
         // Verifica si algún robot ha alcanzado al jugador
         for (Robot robot : robots) {
-            if (robot.getPosicion().equals(jugador.getPosicion())) {
+            if (getCelda(robot.getPosicion()) == celdaJugador) {
                 //El jugador ha perdido por ser alcanzado por un robot.
                 jugadorEstaVivo = false;
+                break;
             }
         }
         return jugadorEstaVivo;

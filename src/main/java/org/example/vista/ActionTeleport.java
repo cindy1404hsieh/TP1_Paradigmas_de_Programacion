@@ -6,6 +6,5 @@ public class ActionTeleport implements Action{
     @Override
     public void apply(Tablero tablero) {
         tablero.getJugador().teletransportarse(tablero);
-        tablero.moverRobots();
     }
 }
