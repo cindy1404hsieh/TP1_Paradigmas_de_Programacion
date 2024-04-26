@@ -63,6 +63,11 @@ public class Vista {
         stage.setTitle("Robots");
         stage.setScene(scene);
         stage.show();
+
+        stage.setOnHidden(e -> {
+            pantallaFinDeJuego.close();
+            System.exit(0);
+        });
     }
 
     /**
