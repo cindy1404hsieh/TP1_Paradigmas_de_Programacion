@@ -25,9 +25,6 @@ public class Celda {
     public boolean isLibre() {
         return estado == Estado.LIBRE;
     }
-    public boolean isOcupada() {
-        return estado == Estado.OCUPADA;
-    }
     public boolean isIncendiada() {
         return estado == Estado.INCENDIADA;
     }

@@ -21,15 +21,27 @@ public class Grilla extends TilePane {
         this.modoTeleport = false;
 
         super.addEventHandler(CeldaSeleccionadaEvent.CELDA_SELECCIONADA, celdaSeleccionadaEvent -> {
-            Coordenada casillaSeleccionada = new Coordenada(celdaSeleccionadaEvent.getI(), celdaSeleccionadaEvent.getJ());
-            this.aplicarAccion(new ActionSafeTeleport(casillaSeleccionada));
+            if (modoTeleport) {
+                Coordenada destino = new Coordenada(celdaSeleccionadaEvent.getI(), celdaSeleccionadaEvent.getJ());
+                tablero.getJugador().teletransportarseSeguro(tablero, destino);
+                modoTeleport = false; // Resetear el estado aquí
+                update();
+                celdaSeleccionadaEvent.consume();
+            }
         });
         super.addEventHandler(SafeTeleportEvent.SAFE_TELEPORT, e -> {
             modoTeleport = true;
+            e.consume();
         });
         super.setOnMouseClicked(mouseEvent -> {
-            aplicarAccion(new ActionMover(siguienteDireccion));
+            if (!modoTeleport) {
+                aplicarAccion(new ActionMover(siguienteDireccion));
+            }
             siguienteDireccion(mouseEvent);
+            // Consumir el evento para evitar que se propague si estamos en modo teleport
+            if (modoTeleport) {
+                mouseEvent.consume();
+            }
         });
         super.addEventHandler(JugadorMurioEvent.JUGADOR_MURIO, e -> {
             modoEspera = true;
@@ -65,14 +77,15 @@ public class Grilla extends TilePane {
             // si la cantidad de columnas es impar, una fila empieza y termina con el mismo color. En ese caso actualizo el valor de colorGrilla
             colorGrilla = (columnas % 2 != 0) == colorGrilla;
             for (int j = 0; j < columnas; j++) {
-                Color color = (colorGrilla) ? Color.LIGHTBLUE : Color.BLUE;
+                Color color = (colorGrilla) ? Color.LIGHTSTEELBLUE : Color.GAINSBORO;
                 Casilla nuevaCasilla = new Casilla(color);
                 int tmpI = i;
                 int tmpJ = j;
                 nuevaCasilla.setOnMouseClicked(mouseEvent -> {
                     if (modoTeleport) {
-                        modoTeleport = false;
                         this.fireEvent(new CeldaSeleccionadaEvent(tmpI, tmpJ));
+                        modoTeleport = false; // Resetear el estado aquí\
+                        mouseEvent.consume();
                     }
                 });
 
@@ -149,6 +162,10 @@ public class Grilla extends TilePane {
      * Resalta el casillero al cual el jugador se moverá en caso de hacer click con el mouse.
      */
     private void siguienteDireccion(MouseEvent mouseEvent) {
+        if (modoTeleport) {
+            mouseEvent.consume();
+            return;
+        }
         if (casillaResaltada != null) casillaResaltada.desResaltar();
         int playerX = tablero.getJugador().getPosicion().getColumna();
         int playerY = tablero.getJugador().getPosicion().getFila();
@@ -158,6 +175,9 @@ public class Grilla extends TilePane {
 
         int gridX = mouseX / LADO_CASILLA;
         int gridY = mouseY / LADO_CASILLA;
+
+        if (gridX >= tablero.getColumnas()) gridX = tablero.getColumnas() - 1;
+        if (gridY >= tablero.getFilas()) gridY = tablero.getFilas() - 1;
 
         int deltaX = gridX - playerX;
         int deltaY = gridY - playerY;

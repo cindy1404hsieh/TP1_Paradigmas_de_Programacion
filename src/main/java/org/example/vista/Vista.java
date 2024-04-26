@@ -31,11 +31,11 @@ public class Vista {
             KeyCode.Z, new ActionMover(Direccion.ABAJO_IZQUIERDA),
             KeyCode.C, new ActionMover(Direccion.ABAJO_DERECHA)
     );
-    private Label scoreLabel;
     private Label nivelLabel;
     private final Label safeTeleportRestante;
     private Tablero tablero;
     private Grilla grilla;
+
 
     public Vista(Stage stage){
         tablero = new Tablero(new Coordenada(10, 10), 1);
@@ -50,7 +50,7 @@ public class Vista {
 
         VBox root = new VBox(layoutSuperior, grilla, botones, layoutInfo);
         root.setAlignment(Pos.CENTER);
-        root.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        root.setBackground(new Background(new BackgroundFill(Color.SILVER, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(root);
         Stage pantallaFinDeJuego = obtenerPantallaFinDeJuego(scene);
@@ -63,6 +63,11 @@ public class Vista {
         stage.setTitle("Robots");
         stage.setScene(scene);
         stage.show();
+
+        stage.setOnHidden(e -> {
+            pantallaFinDeJuego.close();
+            System.exit(0);
+        });
     }
 
     /**
@@ -75,9 +80,8 @@ public class Vista {
         new AnimationTimer() {
             @Override
             public void handle(long ignored) {
-                nivelLabel.setText("nivel: " + tablero.getNivelActual());
-                scoreLabel.setText("score: " + tablero.getScore());
-                safeTeleportRestante.setText("teletransportaciones restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
+                nivelLabel.setText("Nivel: " + tablero.getNivelActual());
+                safeTeleportRestante.setText("Teletransportaciones Restantes: " + tablero.getJugador().getTeletransportacionesDisponibles());
 
                 for (KeyCode keyCode : teclaPresionada) {
                     Action action = controles.get(keyCode);
@@ -102,9 +106,12 @@ public class Vista {
 
         intentarDeNuevo.setOnAction(e -> {
             grilla.fireEvent(new ReiniciarJuegoEvent());
+            tablero.getJugador().setTeletransportacionesDisponibles(1);
             finDelJuegoStage.close();
         });
-
+        finDelJuegoStage.setOnCloseRequest(e -> {
+            System.exit(0);
+        });
         finDelJuegoStage.setScene(new Scene(new VBox(mensaje, intentarDeNuevo)));
         finDelJuegoStage.setTitle("Fin del Juego");
         finDelJuegoStage.initModality(Modality.WINDOW_MODAL);
@@ -119,8 +126,8 @@ public class Vista {
     public void cargarPantallaMenu(Event event) {
         TextField columnasTextfield = new TextField("10");
         TextField filasTextfield = new TextField("10");
-        HBox root = new HBox(new Label("columnas"), columnasTextfield, new Label("filas"), filasTextfield);
-        Button okButton = new Button("aceptar");
+        HBox root = new HBox(new Label("Columnas"), columnasTextfield, new Label("filas"), filasTextfield);
+        Button okButton = new Button("Aceptar");
         Stage menuStage = new Stage();
 
         okButton.setOnAction(ignored -> {
@@ -173,14 +180,13 @@ public class Vista {
      * crea y devuelve la parte superior de la interfaz grafica.
      */
     private HBox obtenerLayoutSuperior() {
-        scoreLabel = new Label();
         nivelLabel = new Label();
-        HBox layoutLabels = new HBox(scoreLabel, nivelLabel);
+        HBox layoutLabels = new HBox(nivelLabel);
         HBox.setHgrow(layoutLabels, Priority.ALWAYS);
         layoutLabels.setMaxWidth(Double.MAX_VALUE);
         layoutLabels.setAlignment(Pos.CENTER);
 
-        Button menuButton = new Button("menu");
+        Button menuButton = new Button("MENU");
         menuButton.setOnAction(this::cargarPantallaMenu);
 
         HBox layoutSuperior = new HBox(layoutLabels, menuButton);

@@ -24,7 +24,7 @@ public class Casilla extends StackPane {
     }
 
     public void resaltar() {
-        super.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+        super.setBackground(new Background(new BackgroundFill(Color.STEELBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     public void desResaltar() {

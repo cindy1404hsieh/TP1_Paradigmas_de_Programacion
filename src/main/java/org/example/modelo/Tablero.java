@@ -1,9 +1,6 @@
 package org.example.modelo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tablero {
     private Celda[][] celdas;
@@ -11,7 +8,7 @@ public class Tablero {
     private List<Celda> celdasIncendiadas;
     private final Jugador jugador;
     private int nivelActual;
-    private int score;
+
 
     public Tablero(Coordenada dimensiones, int nivelInicial) {
         this.celdas = new Celda[dimensiones.getFila()][dimensiones.getColumna()];
@@ -21,8 +18,8 @@ public class Tablero {
         Coordenada coordenadaJugador = new Coordenada(filaJugador, columnaJugador);
         this.jugador = new Jugador(coordenadaJugador);
         celdasIncendiadas = new ArrayList<>();
-        this.nivelActual = nivelInicial; // Inicializa el nivel con el valor proporcionado
-        inicializar(nivelInicial); // Llama a inicializar pasando el nivel inicial
+        this.nivelActual = nivelInicial;
+        inicializar(nivelInicial);
     }
 
     /**
@@ -95,22 +92,18 @@ public class Tablero {
     /*mueve cada robot en el tablero, actualiza las celdas de LIBRE a OCUPADA
     según la nueva posición válida del robot y ajusta la posición del robot..*/
     public void moverRobots() {
-        // Primero, marca todas las celdas como libres antes de mover los robots
-        for (Robot robot : robots) {
+        Iterator<Robot> iterator = robots.iterator();
+        while (iterator.hasNext()) {
+            Robot robot = iterator.next();
             setCeldaEstado(robot.getPosicion(), Celda.Estado.LIBRE);
-        }
-
-        // Mueve cada robot y actualiza las celdas a ocupadas
-        for (Robot robot : robots) {
-            Coordenada posicionActual = robot.getPosicion();
             Coordenada nuevaPosicion = robot.mover(this);
             if (esCeldaValida(nuevaPosicion)) {
                 robot.setPosicion(nuevaPosicion);
+                setCeldaEstado(robot.getPosicion(), Celda.Estado.OCUPADA);
+            }else {
+                iterator.remove();
             }
-            setCeldaEstado(robot.getPosicion(), Celda.Estado.OCUPADA);
         }
-
-        // Verifica colisiones después de mover todos los robots
         verificarColisiones();
         actualizarCeldasIncendiadas();
     }
@@ -118,22 +111,19 @@ public class Tablero {
     /*verifica si el jugador ha perdido el juego
     al pisar una celda incendiada o ser alcanzado por un robot.*/
     public boolean jugadorSigueVivo() {
-        // Verifica si el jugador pisa una celda incendiada
+        boolean jugadorEstaVivo = true;
         Celda celdaJugador = getCelda(jugador.getPosicion());
         if (celdaJugador != null && celdaJugador.isIncendiada()) {
-            System.out.println("a");
             //El jugador ha perdido por pisar una celda incendiada
-             return false;
+            jugadorEstaVivo = false;
         }
-
-        // Verifica si algún robot ha alcanzado al jugador
         for (Robot robot : robots) {
             if (getCelda(robot.getPosicion()) == celdaJugador) {
-                //El jugador ha perdido por ser alcanzado por un robot.
-                return false;
+                jugadorEstaVivo = false;
+                break;
             }
         }
-        return true;
+        return jugadorEstaVivo;
     }
 
     public List<Celda> getCeldasIncendiadas() {
@@ -158,8 +148,7 @@ public class Tablero {
         }
 
         for (Map.Entry<Celda, List<Robot>> entrada : posiciones.entrySet()) {
-            if (entrada.getValue().size() > 1) { // Más de un robot en la misma celda
-                score += entrada.getValue().size();
+            if (entrada.getValue().size() > 1) {
                 incendiarCelda(entrada.getKey());
                 eliminarRobotsEnCelda(entrada.getKey());
             }
@@ -188,7 +177,10 @@ public class Tablero {
     public boolean esCeldaValida(Coordenada coordenada) {
         return coordenada.getFila() >= 0 && coordenada.getFila() < celdas.length && coordenada.getColumna() >= 0 && coordenada.getColumna() < celdas[0].length;
     }
-
+    public boolean esCeldaLibre(Coordenada coordenada) {
+        Celda celda = getCelda(coordenada);
+        return celda != null && celda.getEstado() == Celda.Estado.LIBRE;
+    }
     /*Devuelve la celda en la coordenada especificada si es válida.*/
     public Celda getCelda(Coordenada coordenada) {
         if (esCeldaValida(coordenada)) {
@@ -219,7 +211,4 @@ public class Tablero {
         return nivelActual;
     }
 
-    public int getScore() {
-        return score;
-    }
 }

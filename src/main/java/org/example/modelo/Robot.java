@@ -13,7 +13,7 @@ public abstract class Robot {
     avanzando un número especificado de pasos.
     Calcula la dirección de movimiento comparando la posición del jugador
     con la del robot y ajusta la posición del robot en consecuencia.*/
-    public Coordenada moverHaciaJugador(Tablero tablero, int pasos) {
+    public Coordenada moverHaciaJugador(Tablero tablero) {
         Jugador jugador = tablero.getJugador();
         Coordenada posicionJugador = jugador.getPosicion();
         Coordenada posicionRobot = getPosicion();
@@ -21,8 +21,8 @@ public abstract class Robot {
         int direccionFila = Integer.compare(posicionJugador.getFila(), posicionRobot.getFila());
         int direccionColumna = Integer.compare(posicionJugador.getColumna(), posicionRobot.getColumna());
 
-        int nuevaFila = posicionRobot.getFila() + direccionFila * pasos;
-        int nuevaColumna = posicionRobot.getColumna() + direccionColumna * pasos;
+        int nuevaFila = posicionRobot.getFila() + direccionFila;
+        int nuevaColumna = posicionRobot.getColumna() + direccionColumna;
 
         return new Coordenada(nuevaFila, nuevaColumna);
     }
@@ -33,9 +33,7 @@ public abstract class Robot {
     public void setPosicion(Coordenada nuevaPosicion) {
         posicion = nuevaPosicion;
     }
-    public String getTipo() {
-        return "Generico";
-    }
+    public abstract String getTipo();
 
 }
 
