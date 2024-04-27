@@ -9,10 +9,10 @@ public abstract class Robot {
     /*es implementado por las subclases
     para definir cómo se mueve el robot en el tablero.*/
     public abstract Coordenada mover(Tablero tablero);
-    /*Mueve el robot hacia la posición del jugador en el tablero,
-    avanzando un número especificado de pasos.
-    Calcula la dirección de movimiento comparando la posición del jugador
-    con la del robot y ajusta la posición del robot en consecuencia.*/
+    /*mueve el robot hacia la posicion del jugador en el tablero,
+    avanzando un numero especificado de pasos.
+    calcula la direccion de movimiento comparando la posicion del jugador
+    con la del robot y ajusta la posicion del robot en consecuencia.*/
     public Coordenada moverHaciaJugador(Tablero tablero) {
         Jugador jugador = tablero.getJugador();
         Coordenada posicionJugador = jugador.getPosicion();
@@ -26,7 +26,7 @@ public abstract class Robot {
 
         return new Coordenada(nuevaFila, nuevaColumna);
     }
-    /*Devuelve la posición actual del robot.*/
+    /*devuelve la posicion actual del robot.*/
     public Coordenada getPosicion() {
         return posicion;
     }

@@ -141,7 +141,7 @@ public class Vista {
         TextField columnasTextfield = new TextField("10");
         TextField filasTextfield = new TextField("10");
         Label maxTamanioLabel = new Label("Tamaño máx recomendado: 37x76 No te pases!");
-        HBox root = new HBox( new Label("filas"), filasTextfield,new Label("Columnas"), columnasTextfield, maxTamanioLabel);
+        HBox root = new HBox( new Label("Filas"), filasTextfield,new Label("Columnas"), columnasTextfield, maxTamanioLabel);
         Button okButton = new Button("Aceptar");
         Stage menuStage = new Stage();
 

@@ -7,8 +7,8 @@ public class Jugador {
         this.posicion = posicion;
         this.teletransportacionesDisponibles = 1;
     }
-    /*Mueve al jugador en la dirección especificada
-     si la nueva posición es válida.*/
+    /*Mueve al jugador en la direccion especificada
+     si la nueva posicion es válida.*/
     public void mover(Tablero tablero, Direccion direccion) {
         Coordenada nuevaPosicion = new Coordenada(this.posicion.getFila(), this.posicion.getColumna());
 
@@ -51,7 +51,7 @@ public class Jugador {
         }
 
     }
-    /*Teletransporta al jugador a una posición aleatoria válida en el tablero.*/
+    /*Teletransporta al jugador a una posicion aleatoria válida en el tablero.*/
     public void teletransportarse(Tablero tablero) {
         int nuevaFila = (int) (Math.random() * tablero.getFilas());
         int nuevaColumna = (int) (Math.random() * tablero.getColumnas());
@@ -67,7 +67,7 @@ public class Jugador {
         setPosicion(nuevaPosicion);
 
     }
-    /*Teletransporta al jugador a una posición específica si es válida,
+    /*Teletransporta al jugador a una posicion especifica si es valida,
     está libre y quedan teletransportaciones disponibles.*/
     public void teletransportarseSeguro(Tablero tablero, Coordenada destino) {
         if (teletransportacionesDisponibles > 0 && tablero.esCeldaValida(destino) && tablero.getCelda(destino).isLibre()) {
@@ -76,19 +76,19 @@ public class Jugador {
 
         }
     }
-    /*Devuelve la posición actual del jugador.*/
+    /*Devuelve la posicion actual del jugador.*/
     public Coordenada getPosicion() {
         return posicion;
     }
-    /*Establece una nueva posición para el jugador.*/
+    /*Establece una nueva posicion para el jugador.*/
     public void setPosicion(Coordenada posicion) {
         this.posicion = posicion;
     }
-    /*Devuelve el número de teletransportaciones disponibles.*/
+    /*Devuelve el numero de teletransportaciones disponibles.*/
     public int getTeletransportacionesDisponibles() {
         return teletransportacionesDisponibles;
     }
-    /*Establece el número de teletransportaciones disponibles para el jugador.*/
+    /*Establece el numero de teletransportaciones disponibles para el jugador.*/
     public void setTeletransportacionesDisponibles(int teletransportacionesDisponibles) {
         this.teletransportacionesDisponibles = teletransportacionesDisponibles;
     }

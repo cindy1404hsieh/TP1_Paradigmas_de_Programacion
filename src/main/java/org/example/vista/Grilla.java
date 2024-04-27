@@ -24,7 +24,7 @@ public class Grilla extends TilePane {
             if (modoTeleport) {
                 Coordenada destino = new Coordenada(celdaSeleccionadaEvent.getI(), celdaSeleccionadaEvent.getJ());
                 tablero.getJugador().teletransportarseSeguro(tablero, destino);
-                modoTeleport = false; // Resetear el estado aquí
+                modoTeleport = false;
                 update();
                 celdaSeleccionadaEvent.consume();
             }
@@ -38,7 +38,6 @@ public class Grilla extends TilePane {
                 aplicarAccion(new ActionMover(siguienteDireccion));
             }
             siguienteDireccion(mouseEvent);
-            // Consumir el evento para evitar que se propague si estamos en modo teleport
             if (modoTeleport) {
                 mouseEvent.consume();
             }
@@ -84,7 +83,7 @@ public class Grilla extends TilePane {
                 nuevaCasilla.setOnMouseClicked(mouseEvent -> {
                     if (modoTeleport) {
                         this.fireEvent(new CeldaSeleccionadaEvent(tmpI, tmpJ));
-                        modoTeleport = false; // Resetear el estado aquí\
+                        modoTeleport = false;
                         mouseEvent.consume();
                     }
                 });
@@ -159,7 +158,7 @@ public class Grilla extends TilePane {
 
     /**
      * Calcula la direccion del movimiento del jugador segun la posicion del mouse.
-     * Resalta el casillero al cual el jugador se moverá en caso de hacer click con el mouse.
+     * Resalta el casillero al cual el jugador se movera en caso de hacer click con el mouse.
      */
     private void siguienteDireccion(MouseEvent mouseEvent) {
         if (modoTeleport) {
