@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import org.example.modelo.Coordenada;
 import org.example.modelo.Direccion;
@@ -38,7 +39,7 @@ public class Vista {
     private Grilla grilla;
 
 
-    public Vista(Stage stage){
+    public Vista(Stage stage) {
         tablero = new Tablero(new Coordenada(10, 10), 1);
         grilla = new Grilla(tablero);
         HBox layoutSuperior = obtenerLayoutSuperior();
@@ -46,6 +47,7 @@ public class Vista {
 
         safeTeleportRestante = new Label();
         HBox layoutInfo = new HBox(safeTeleportRestante);
+        layoutInfo = new HBox(safeTeleportRestante);
         layoutInfo.setAlignment(Pos.CENTER);
         layoutInfo.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -92,7 +94,12 @@ public class Vista {
                 /*if (!tablero.jugadorSigueVivo()) {
                     grilla.fireEvent(new JugadorMurioEvent());
                 }*/
-                if (tablero.getRobots().isEmpty()) tablero.siguienteNivel();
+                if (tablero.getRobots().isEmpty()) {
+                    tablero.siguienteNivel();
+                    grilla.getChildren().clear();
+                    grilla.dibujarGrilla();
+                    grilla.dibujarEntidades();
+                }
             }
         }.start();
     }
@@ -180,6 +187,7 @@ public class Vista {
     /**
      * crea y devuelve la parte superior de la interfaz grafica.
      */
+
     private HBox obtenerLayoutSuperior() {
         scoreLabel = new Label();
         nivelLabel = new Label();

@@ -65,13 +65,15 @@ public class Tablero {
     private void inicializarRobots(int nivel) {
         int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);//un tercio del total de celdas en el tablero
         int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2); // a medida que el nivel aumenta, la cantidad de robots también aumenta de manera controlada
-
+        Set<Coordenada> posicionesOcupadas = new HashSet<>();
+        posicionesOcupadas.add(jugador.getPosicion());
         for (int i = 0; i < cantidadRobots; i++) {
-            Coordenada coordenadaRobot = generarCoordenadaAleatoria();
-
-            while (!esCeldaValida(coordenadaRobot) || jugador.getPosicion().equals(coordenadaRobot)) {
+            Coordenada coordenadaRobot;
+            do {
                 coordenadaRobot = generarCoordenadaAleatoria();
-            }
+            } while (posicionesOcupadas.contains(coordenadaRobot));
+
+            posicionesOcupadas.add(coordenadaRobot);
             //asegura que aproximadamente genera mitad y mitad de dos tipos de robot
             if (Math.random() < 0.5) {
                 robots.add(new Robot1x(coordenadaRobot));
