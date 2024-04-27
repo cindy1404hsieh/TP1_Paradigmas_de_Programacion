@@ -38,6 +38,7 @@ public class Tablero {
         inicializar(nivelActual);
         int teletransportacionesDisponibles = jugador.getTeletransportacionesDisponibles();
         jugador.setTeletransportacionesDisponibles(teletransportacionesDisponibles+1);
+
     }
 
     /* Prepara el tablero para el juego al establecer todas las celdas a LIBRE
@@ -52,6 +53,10 @@ public class Tablero {
                 celdas[fila][columna] = new Celda(Celda.Estado.LIBRE, new Coordenada(fila, columna));
             }
         }
+        int filaCentral = celdas.length / 2;
+        int columnaCentral = celdas[0].length / 2;
+        Coordenada posicionCentral = new Coordenada(filaCentral, columnaCentral);
+        jugador.setPosicion(posicionCentral);
         inicializarRobots(nivel);
     }
 
@@ -60,13 +65,15 @@ public class Tablero {
     private void inicializarRobots(int nivel) {
         int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);//un tercio del total de celdas en el tablero
         int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2); // a medida que el nivel aumenta, la cantidad de robots también aumenta de manera controlada
-
+        Set<Coordenada> posicionesOcupadas = new HashSet<>();
+        posicionesOcupadas.add(jugador.getPosicion());
         for (int i = 0; i < cantidadRobots; i++) {
-            Coordenada coordenadaRobot = generarCoordenadaAleatoria();
-
-            while (!esCeldaValida(coordenadaRobot) || jugador.getPosicion().equals(coordenadaRobot)) {
+            Coordenada coordenadaRobot;
+            do {
                 coordenadaRobot = generarCoordenadaAleatoria();
-            }
+            } while (posicionesOcupadas.contains(coordenadaRobot));
+
+            posicionesOcupadas.add(coordenadaRobot);
             //asegura que aproximadamente genera mitad y mitad de dos tipos de robot
             if (Math.random() < 0.5) {
                 robots.add(new Robot1x(coordenadaRobot));
@@ -97,7 +104,9 @@ public class Tablero {
             Robot robot = iterator.next();
             setCeldaEstado(robot.getPosicion(), Celda.Estado.LIBRE);
             Coordenada nuevaPosicion = robot.mover(this);
-            if (esCeldaValida(nuevaPosicion)) {
+            if (nuevaPosicion == null) {
+                iterator.remove();
+            } else if (esCeldaValida(nuevaPosicion)) {
                 robot.setPosicion(nuevaPosicion);
                 setCeldaEstado(robot.getPosicion(), Celda.Estado.OCUPADA);
             }else {
@@ -177,10 +186,10 @@ public class Tablero {
     public boolean esCeldaValida(Coordenada coordenada) {
         return coordenada.getFila() >= 0 && coordenada.getFila() < celdas.length && coordenada.getColumna() >= 0 && coordenada.getColumna() < celdas[0].length;
     }
-    public boolean esCeldaLibre(Coordenada coordenada) {
+/*    public boolean esCeldaLibre(Coordenada coordenada) {
         Celda celda = getCelda(coordenada);
         return celda != null && celda.getEstado() == Celda.Estado.LIBRE;
-    }
+    }*/
     /*Devuelve la celda en la coordenada especificada si es válida.*/
     public Celda getCelda(Coordenada coordenada) {
         if (esCeldaValida(coordenada)) {

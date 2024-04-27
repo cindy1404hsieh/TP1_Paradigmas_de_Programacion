@@ -35,9 +35,10 @@ public class Vista {
     private final Label safeTeleportRestante;
     private Tablero tablero;
     private Grilla grilla;
+    private Stage stage;
 
-
-    public Vista(Stage stage){
+    public Vista(Stage stage) {
+        this.stage = stage;
         tablero = new Tablero(new Coordenada(10, 10), 1);
         grilla = new Grilla(tablero);
         HBox layoutSuperior = obtenerLayoutSuperior();
@@ -45,6 +46,7 @@ public class Vista {
 
         safeTeleportRestante = new Label();
         HBox layoutInfo = new HBox(safeTeleportRestante);
+        layoutInfo = new HBox(safeTeleportRestante);
         layoutInfo.setAlignment(Pos.CENTER);
         layoutInfo.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -91,7 +93,12 @@ public class Vista {
                 if (!tablero.jugadorSigueVivo()) {
                     grilla.fireEvent(new JugadorMurioEvent());
                 }
-                if (tablero.getRobots().isEmpty()) tablero.siguienteNivel();
+                if (tablero.getRobots().isEmpty()) {
+                    tablero.siguienteNivel();
+                    grilla.getChildren().clear();
+                    grilla.dibujarGrilla();
+                    grilla.dibujarEntidades();
+                }
             }
         }.start();
     }
@@ -100,8 +107,8 @@ public class Vista {
      * Crea y carga una pantalla de fin de juego, con la opcion de reiniciar la partida.
      */
     private Stage obtenerPantallaFinDeJuego(Scene scene) {
-        Label mensaje = new Label("Perdiste el juego :(");
-        Button intentarDeNuevo = new Button("Intentar de nuevo?");
+        Label mensaje = new Label("    Perdiste el juego :(    ");
+        Button intentarDeNuevo = new Button("    Intentar de nuevo?    ");
         Stage finDelJuegoStage = new Stage();
 
         intentarDeNuevo.setOnAction(e -> {
@@ -126,7 +133,8 @@ public class Vista {
     public void cargarPantallaMenu(Event event) {
         TextField columnasTextfield = new TextField("10");
         TextField filasTextfield = new TextField("10");
-        HBox root = new HBox(new Label("Columnas"), columnasTextfield, new Label("filas"), filasTextfield);
+        Label maxTamanioLabel = new Label("Tamaño máx recomendado: 37x76 No te pases!");
+        HBox root = new HBox( new Label("filas"), filasTextfield,new Label("Columnas"), columnasTextfield, maxTamanioLabel);
         Button okButton = new Button("Aceptar");
         Stage menuStage = new Stage();
 
@@ -138,6 +146,7 @@ public class Vista {
             grilla.dibujarGrilla();
             grilla.dibujarEntidades();
             menuStage.close();
+            this.stage.sizeToScene();
         });
 
         menuStage.setScene(new Scene(new VBox(root, okButton)));
@@ -179,6 +188,7 @@ public class Vista {
     /**
      * crea y devuelve la parte superior de la interfaz grafica.
      */
+
     private HBox obtenerLayoutSuperior() {
         nivelLabel = new Label();
         HBox layoutLabels = new HBox(nivelLabel);
