@@ -89,9 +89,9 @@ public class Vista {
                     if (action != null) grilla.aplicarAccion(action);
                     teclaPresionada.remove(keyCode);
                 }
-                if (!tablero.jugadorSigueVivo()) {
+                /*if (!tablero.jugadorSigueVivo()) {
                     grilla.fireEvent(new JugadorMurioEvent());
-                }
+                }*/
                 if (tablero.getRobots().isEmpty()) tablero.siguienteNivel();
             }
         }.start();
