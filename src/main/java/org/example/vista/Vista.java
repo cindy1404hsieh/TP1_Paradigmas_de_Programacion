@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -33,9 +34,9 @@ public class Vista {
     );
     private Label nivelLabel;
     private final Label safeTeleportRestante;
-    private Tablero tablero;
-    private Grilla grilla;
-    private Stage stage;
+    private final Tablero tablero;
+    private final Grilla grilla;
+    private final Stage stage;
 
     public Vista(Stage stage) {
         this.stage = stage;
@@ -46,7 +47,6 @@ public class Vista {
 
         safeTeleportRestante = new Label();
         HBox layoutInfo = new HBox(safeTeleportRestante);
-        layoutInfo = new HBox(safeTeleportRestante);
         layoutInfo.setAlignment(Pos.CENTER);
         layoutInfo.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -98,6 +98,12 @@ public class Vista {
                     grilla.getChildren().clear();
                     grilla.dibujarGrilla();
                     grilla.dibujarEntidades();
+
+                    Alert siguienteNivelAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    siguienteNivelAlert.setTitle("Felicidades!");
+                    siguienteNivelAlert.setHeaderText("Pasaste al siguiente nivel");
+                    siguienteNivelAlert.setContentText(":)");
+                    siguienteNivelAlert.show();
                 }
             }
         }.start();
@@ -116,6 +122,7 @@ public class Vista {
             tablero.getJugador().setTeletransportacionesDisponibles(1);
             finDelJuegoStage.close();
         });
+
         finDelJuegoStage.setOnCloseRequest(e -> {
             System.exit(0);
         });
