@@ -37,7 +37,7 @@ public class Tablero {
         celdasIncendiadas.clear();
         inicializar(nivelActual);
         int teletransportacionesDisponibles = jugador.getTeletransportacionesDisponibles();
-        jugador.setTeletransportacionesDisponibles(teletransportacionesDisponibles+1);
+        jugador.setTeletransportacionesDisponibles(teletransportacionesDisponibles + 1);
 
     }
 
@@ -109,7 +109,7 @@ public class Tablero {
             } else if (esCeldaValida(nuevaPosicion)) {
                 robot.setPosicion(nuevaPosicion);
                 setCeldaEstado(robot.getPosicion(), Celda.Estado.OCUPADA);
-            }else {
+            } else {
                 iterator.remove();
             }
         }
@@ -186,10 +186,11 @@ public class Tablero {
     public boolean esCeldaValida(Coordenada coordenada) {
         return coordenada.getFila() >= 0 && coordenada.getFila() < celdas.length && coordenada.getColumna() >= 0 && coordenada.getColumna() < celdas[0].length;
     }
-/*    public boolean esCeldaLibre(Coordenada coordenada) {
-        Celda celda = getCelda(coordenada);
-        return celda != null && celda.getEstado() == Celda.Estado.LIBRE;
-    }*/
+
+    /*    public boolean esCeldaLibre(Coordenada coordenada) {
+            Celda celda = getCelda(coordenada);
+            return celda != null && celda.getEstado() == Celda.Estado.LIBRE;
+        }*/
     /*Devuelve la celda en la coordenada especificada si es válida.*/
     public Celda getCelda(Coordenada coordenada) {
         if (esCeldaValida(coordenada)) {
@@ -203,18 +204,22 @@ public class Tablero {
     public int getFilas() {
         return celdas.length;
     }
+
     /*Devuelven las dimensiones del tablero.*/
     public int getColumnas() {
         return celdas[0].length;
     }
+
     /*Devuelve el objeto Jugador asociado con el tablero.*/
     public Jugador getJugador() {
         return jugador;
     }
+
     /*Devuelve la lista de robots en el tablero.*/
     public List<Robot> getRobots() {
         return robots;
     }
+
     /*Devuelve el nivel actual del juego.*/
     public int getNivelActual() {
         return nivelActual;
