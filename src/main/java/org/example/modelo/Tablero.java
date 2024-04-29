@@ -63,30 +63,32 @@ public class Tablero {
     /*Coloca una cantidad de robots que depende del nivel del juego
     en posiciones aleatorias en el tablero.*/
     private void inicializarRobots(int nivel) {
-        int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);//un tercio del total de celdas en el tablero
-        int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2); // a medida que el nivel aumenta, la cantidad de robots también aumenta de manera controlada
-        Set<Coordenada> posicionesOcupadas = new HashSet<>();
-        posicionesOcupadas.add(jugador.getPosicion());
-        for (int i = 0; i < cantidadRobots; i++) {
-            Coordenada coordenadaRobot;
-            do {
-                coordenadaRobot = generarCoordenadaAleatoria();
-            } while (posicionesOcupadas.contains(coordenadaRobot));
+        int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);
+        int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2);
+        List<Coordenada> posicionesDisponibles = new ArrayList<>();
 
-            posicionesOcupadas.add(coordenadaRobot);
-            //asegura que aproximadamente genera mitad y mitad de dos tipos de robot
+        for (int fila = 0; fila < celdas.length; fila++) {
+            for (int columna = 0; columna < celdas[0].length; columna++) {
+                Coordenada pos = new Coordenada(fila, columna);
+                if (!pos.equals(jugador.getPosicion())) {
+                    posicionesDisponibles.add(pos);
+                }
+            }
+        }
+        Collections.shuffle(posicionesDisponibles);
+        for (int i = 0; i < cantidadRobots; i++) {
+            Coordenada coordenadaRobot = posicionesDisponibles.get(i);
             if (Math.random() < 0.5) {
                 robots.add(new Robot1x(coordenadaRobot));
             } else {
                 robots.add(new Robot2x(coordenadaRobot));
             }
-
             setCeldaEstado(coordenadaRobot, Celda.Estado.OCUPADA);
         }
     }
 
     /*Genera una coordenada aleatoria en el tablero
-    que no sea la posición actual del jugador.*/
+    que no sea la posicion actual del jugador.*/
     private Coordenada generarCoordenadaAleatoria() {
         int fila, columna;
         do {
@@ -97,7 +99,7 @@ public class Tablero {
     }
 
     /*mueve cada robot en el tablero, actualiza las celdas de LIBRE a OCUPADA
-    según la nueva posición válida del robot y ajusta la posición del robot..*/
+    segun la nueva posicion valida del robot y ajusta la posicion del robot..*/
     public void moverRobots() {
         Iterator<Robot> iterator = robots.iterator();
         while (iterator.hasNext()) {
@@ -123,13 +125,13 @@ public class Tablero {
         boolean jugadorEstaVivo = true;
         Celda celdaJugador = getCelda(jugador.getPosicion());
         if (celdaJugador != null && celdaJugador.isIncendiada()) {
-            //El jugador ha perdido por pisar una celda incendiada
             jugadorEstaVivo = false;
-        }
-        for (Robot robot : robots) {
-            if (getCelda(robot.getPosicion()) == celdaJugador) {
-                jugadorEstaVivo = false;
-                break;
+        }else{
+            for (Robot robot : robots) {
+                if (getCelda(robot.getPosicion()) == celdaJugador) {
+                    jugadorEstaVivo = false;
+                    break;
+                }
             }
         }
         return jugadorEstaVivo;
@@ -147,9 +149,9 @@ public class Tablero {
         }
     }
 
-    /*verifica si hay colisiones entre robots que ocupan la misma posición en el tablero.
-    Si se detecta una colisión en una posición,
-    esa celda se incendia y todos los robots en esa posición son eliminados.*/
+    /*verifica si hay colisiones entre robots que ocupan la misma posicion en el tablero.
+    Si se detecta una colision en una posicion,
+    esa celda se incendia y todos los robots en esa posicion son eliminados.*/
     public void verificarColisiones() {
         Map<Celda, List<Robot>> posiciones = new HashMap<>();
         for (Robot robot : robots) {
@@ -182,7 +184,7 @@ public class Tablero {
         }
     }
 
-    /*Verifica si una coordenada está dentro de los límites del tablero.*/
+    /*Verifica si una coordenada estadentro de los limites del tablero.*/
     public boolean esCeldaValida(Coordenada coordenada) {
         return coordenada.getFila() >= 0 && coordenada.getFila() < celdas.length && coordenada.getColumna() >= 0 && coordenada.getColumna() < celdas[0].length;
     }

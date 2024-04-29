@@ -9,25 +9,17 @@ public class Robot2x extends Robot {
     public String getTipo() {
         return "Robot2x";
     }
-    /*Mueve el robot hacia la posición del jugador en el tablero.
-     Este robot se mueve un paso hacia el jugador cada vez que se invoca este método.
+    /*Mueve el robot hacia la posicion del jugador en el tablero.
+     Este robot se mueve dos pasos hacia el jugador cada vez que se invoca este metodo.
      El tablero de juego donde se encuentra el robot,
-     retorna la nueva posición del robot después de moverse hacia el jugador.*/
-
-    /*public Coordenada mover(Tablero tablero) {
-        for (int i = 0; i < 2; i++) {
-            Coordenada siguientePosicion = moverHaciaJugador(tablero);
-            setPosicion(siguientePosicion);
-        }
-        return getPosicion();
-    }*/
+     retorna la nueva posicion del robot despues de moverse hacia el jugador
+     o null si la celda esta incendiada.*/
     public Coordenada mover(Tablero tablero) {
         Coordenada siguientePosicion = getPosicion();
         for (int i = 0; i < 2; i++) {
             siguientePosicion = moverHaciaJugador(tablero);
             setPosicion(siguientePosicion);
             if (tablero.getCelda(siguientePosicion).getEstado() == Celda.Estado.INCENDIADA) {
-                // Marcar el robot para eliminación o devolver null para indicar que debe ser eliminado
                 return null;
             }
         }
