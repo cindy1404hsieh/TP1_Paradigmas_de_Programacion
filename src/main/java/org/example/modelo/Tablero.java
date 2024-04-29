@@ -63,24 +63,26 @@ public class Tablero {
     /*Coloca una cantidad de robots que depende del nivel del juego
     en posiciones aleatorias en el tablero.*/
     private void inicializarRobots(int nivel) {
-        int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);//un tercio del total de celdas en el tablero
-        int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2); // a medida que el nivel aumenta, la cantidad de robots tambien aumenta de manera controlada
-        Set<Coordenada> posicionesOcupadas = new HashSet<>();
-        posicionesOcupadas.add(jugador.getPosicion());
-        for (int i = 0; i < cantidadRobots; i++) {
-            Coordenada coordenadaRobot;
-            do {
-                coordenadaRobot = generarCoordenadaAleatoria();
-            } while (posicionesOcupadas.contains(coordenadaRobot));
+        int baseRobots = Math.max(2, (celdas.length * celdas[0].length) / 3);
+        int cantidadRobots = (int) (Math.random() * baseRobots * nivel / 10 + 2);
+        List<Coordenada> posicionesDisponibles = new ArrayList<>();
 
-            posicionesOcupadas.add(coordenadaRobot);
-            //asegura que aproximadamente genera mitad y mitad de dos tipos de robot
+        for (int fila = 0; fila < celdas.length; fila++) {
+            for (int columna = 0; columna < celdas[0].length; columna++) {
+                Coordenada pos = new Coordenada(fila, columna);
+                if (!pos.equals(jugador.getPosicion())) {
+                    posicionesDisponibles.add(pos);
+                }
+            }
+        }
+        Collections.shuffle(posicionesDisponibles);
+        for (int i = 0; i < cantidadRobots; i++) {
+            Coordenada coordenadaRobot = posicionesDisponibles.get(i);
             if (Math.random() < 0.5) {
                 robots.add(new Robot1x(coordenadaRobot));
             } else {
                 robots.add(new Robot2x(coordenadaRobot));
             }
-
             setCeldaEstado(coordenadaRobot, Celda.Estado.OCUPADA);
         }
     }
@@ -123,13 +125,13 @@ public class Tablero {
         boolean jugadorEstaVivo = true;
         Celda celdaJugador = getCelda(jugador.getPosicion());
         if (celdaJugador != null && celdaJugador.isIncendiada()) {
-            //El jugador ha perdido por pisar una celda incendiada
             jugadorEstaVivo = false;
-        }
-        for (Robot robot : robots) {
-            if (getCelda(robot.getPosicion()) == celdaJugador) {
-                jugadorEstaVivo = false;
-                break;
+        }else{
+            for (Robot robot : robots) {
+                if (getCelda(robot.getPosicion()) == celdaJugador) {
+                    jugadorEstaVivo = false;
+                    break;
+                }
             }
         }
         return jugadorEstaVivo;

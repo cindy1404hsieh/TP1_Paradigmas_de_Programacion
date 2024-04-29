@@ -26,6 +26,7 @@ public abstract class Robot {
 
         return new Coordenada(nuevaFila, nuevaColumna);
     }
+    public abstract String getTipo();
     /*devuelve la posicion actual del robot.*/
     public Coordenada getPosicion() {
         return posicion;
@@ -33,7 +34,7 @@ public abstract class Robot {
     public void setPosicion(Coordenada nuevaPosicion) {
         posicion = nuevaPosicion;
     }
-    public abstract String getTipo();
+
 
 }
 

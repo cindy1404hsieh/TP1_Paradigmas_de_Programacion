@@ -1,5 +1,7 @@
 package org.example.modelo;
 
+import java.util.Map;
+
 public class Jugador {
     private Coordenada posicion;
     private int teletransportacionesDisponibles;
@@ -10,62 +12,28 @@ public class Jugador {
     /*Mueve al jugador en la direccion especificada
      si la nueva posicion es válida.*/
     public void mover(Tablero tablero, Direccion direccion) {
-        Coordenada nuevaPosicion = new Coordenada(this.posicion.getFila(), this.posicion.getColumna());
-
-        switch (direccion) {
-
-            case ARRIBA:
-                nuevaPosicion.setFila(nuevaPosicion.getFila() - 1);
-                break;
-            case ABAJO:
-                nuevaPosicion.setFila(nuevaPosicion.getFila() + 1);
-                break;
-            case IZQUIERDA:
-                nuevaPosicion.setColumna(nuevaPosicion.getColumna() - 1);
-                break;
-            case DERECHA:
-                nuevaPosicion.setColumna(nuevaPosicion.getColumna() + 1);
-                break;
-            case ARRIBA_IZQUIERDA:
-                nuevaPosicion.setFila(nuevaPosicion.getFila() - 1);
-                nuevaPosicion.setColumna(nuevaPosicion.getColumna() - 1);
-                break;
-            case ARRIBA_DERECHA:
-                nuevaPosicion.setFila(nuevaPosicion.getFila() - 1);
-                nuevaPosicion.setColumna(nuevaPosicion.getColumna() + 1);
-                break;
-            case ABAJO_IZQUIERDA:
-                nuevaPosicion.setFila(nuevaPosicion.getFila() + 1);
-                nuevaPosicion.setColumna(nuevaPosicion.getColumna() - 1);
-                break;
-            case ABAJO_DERECHA:
-                nuevaPosicion.setFila(nuevaPosicion.getFila() + 1);
-                nuevaPosicion.setColumna(nuevaPosicion.getColumna() + 1);
-                break;
-            case PERMANECER:
-                break;
-        }
+        Coordenada movimiento = direccion.getMovimiento();
+        Coordenada posicionActual = getPosicion();
+        int nuevaFila = posicionActual.getFila() + movimiento.getFila();
+        int nuevaColumna = posicionActual.getColumna() + movimiento.getColumna();
+        Coordenada nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
 
         if (tablero.esCeldaValida(nuevaPosicion)) {
             setPosicion(nuevaPosicion);
         }
-
     }
     /*Teletransporta al jugador a una posicion aleatoria válida en el tablero.*/
     public void teletransportarse(Tablero tablero) {
-        int nuevaFila = (int) (Math.random() * tablero.getFilas());
-        int nuevaColumna = (int) (Math.random() * tablero.getColumnas());
+        int nuevaFila, nuevaColumna;
+        Coordenada nuevaPosicion;
 
-        Coordenada nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
-
-        while (!tablero.esCeldaValida(nuevaPosicion)) {
+        do {
             nuevaFila = (int) (Math.random() * tablero.getFilas());
             nuevaColumna = (int) (Math.random() * tablero.getColumnas());
             nuevaPosicion = new Coordenada(nuevaFila, nuevaColumna);
-        }
+        } while (!tablero.esCeldaValida(nuevaPosicion));
 
         setPosicion(nuevaPosicion);
-
     }
     /*Teletransporta al jugador a una posicion especifica si es valida,
     está libre y quedan teletransportaciones disponibles.*/
