@@ -9,6 +9,7 @@ public class Robot2x extends Robot {
     public String getTipo() {
         return "Robot2x";
     }
+
     /*Mueve el robot hacia la posicion del jugador en el tablero.
      Este robot se mueve dos pasos hacia el jugador cada vez que se invoca este metodo.
      El tablero de juego donde se encuentra el robot,

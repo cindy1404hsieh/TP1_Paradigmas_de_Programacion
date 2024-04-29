@@ -77,7 +77,9 @@ public class Vista {
      */
     private void setMainLoop(Scene scene) {
         HashSet<KeyCode> teclaPresionada = new HashSet<>();
-        scene.setOnKeyPressed(keyEvent -> {teclaPresionada.add(keyEvent.getCode());});
+        scene.setOnKeyPressed(keyEvent -> {
+            teclaPresionada.add(keyEvent.getCode());
+        });
 
         new AnimationTimer() {
             @Override
@@ -141,7 +143,7 @@ public class Vista {
         TextField columnasTextfield = new TextField("10");
         TextField filasTextfield = new TextField("10");
         Label maxTamanioLabel = new Label("Tamaño máx recomendado: 37x76 No te pases!");
-        HBox root = new HBox( new Label("Filas"), filasTextfield,new Label("Columnas"), columnasTextfield, maxTamanioLabel);
+        HBox root = new HBox(new Label("Filas"), filasTextfield, new Label("Columnas"), columnasTextfield, maxTamanioLabel);
         Button okButton = new Button("Aceptar");
         Stage menuStage = new Stage();
 
@@ -159,7 +161,7 @@ public class Vista {
         menuStage.setScene(new Scene(new VBox(root, okButton)));
         menuStage.setTitle("Ajustar tamaño");
         menuStage.initModality(Modality.WINDOW_MODAL);
-        menuStage.initOwner(((Node)event.getSource()).getScene().getWindow());
+        menuStage.initOwner(((Node) event.getSource()).getScene().getWindow());
         menuStage.setResizable(false);
         menuStage.show();
     }

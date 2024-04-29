@@ -12,7 +12,7 @@ public class Grilla extends TilePane {
     private Casilla casillaResaltada;
     private boolean modoEspera;
     private boolean modoTeleport;
-    private Direccion siguienteDireccion;
+    private Coordenada siguienteDireccion;
 
     public Grilla(Tablero tablero) {
         super();
@@ -35,7 +35,7 @@ public class Grilla extends TilePane {
         });
         super.setOnMouseClicked(mouseEvent -> {
             if (!modoTeleport) {
-                aplicarAccion(new ActionMover(siguienteDireccion));
+                aplicarAccion(new ActionMoverACelda(siguienteDireccion));
             }
             siguienteDireccion(mouseEvent);
             if (modoTeleport) {
@@ -62,32 +62,20 @@ public class Grilla extends TilePane {
     /**
      * Crea una grilla del tamaño del tablero.
      */
-    public void dibujarGrilla(){
+    public void dibujarGrilla() {
         this.casillas = new Casilla[tablero.getFilas()][tablero.getColumnas()];
         int columnas = tablero.getColumnas();
         int filas = tablero.getFilas();
         super.setPrefColumns(columnas);
         super.setPrefRows(filas);
+        super.setMaxSize(columnas * LADO_CASILLA, filas * LADO_CASILLA);
 
         boolean colorGrilla = true;
-        super.setMaxSize(columnas*LADO_CASILLA, filas*LADO_CASILLA);
-
         for (int i = 0; i < filas; i++) {
             // si la cantidad de columnas es impar, una fila empieza y termina con el mismo color. En ese caso actualizo el valor de colorGrilla
             colorGrilla = (columnas % 2 != 0) == colorGrilla;
             for (int j = 0; j < columnas; j++) {
-                Color color = (colorGrilla) ? Color.LIGHTSTEELBLUE : Color.GAINSBORO;
-                Casilla nuevaCasilla = new Casilla(color);
-                int tmpI = i;
-                int tmpJ = j;
-                nuevaCasilla.setOnMouseClicked(mouseEvent -> {
-                    if (modoTeleport) {
-                        this.fireEvent(new CeldaSeleccionadaEvent(tmpI, tmpJ));
-                        modoTeleport = false;
-                        mouseEvent.consume();
-                    }
-                });
-
+                Casilla nuevaCasilla = getCasilla(colorGrilla, i, j);
                 casillas[i][j] = nuevaCasilla;
                 super.getChildren().add(nuevaCasilla);
                 colorGrilla = !colorGrilla;
@@ -95,6 +83,26 @@ public class Grilla extends TilePane {
             }
         }
 
+    }
+
+    /**
+     * Crea una nueva casilla con su listener implementado.
+     * @param colorGrilla indica el color que debe tener la casilla.
+     * @param i fila de la nueva casilla
+     * @param j columna de la nueva casilla
+     */
+    private Casilla getCasilla(boolean colorGrilla, int i, int j) {
+        Color color = colorGrilla ? Color.LIGHTSTEELBLUE : Color.GAINSBORO;
+        Casilla nuevaCasilla = new Casilla(color);
+
+        nuevaCasilla.setOnMouseClicked(mouseEvent -> {
+            if (modoTeleport) {
+                this.fireEvent(new CeldaSeleccionadaEvent(i, j));
+                modoTeleport = false;
+                mouseEvent.consume();
+            }
+        });
+        return nuevaCasilla;
     }
 
     /**
@@ -157,7 +165,7 @@ public class Grilla extends TilePane {
     }
 
     /**
-     * Calcula la direccion del movimiento del jugador segun la posicion del mouse.
+     * Guarda la direccion del movimiento del jugador segun la posicion del mouse.
      * Resalta el casillero al cual el jugador se movera en caso de hacer click con el mouse.
      */
     private void siguienteDireccion(MouseEvent mouseEvent) {
@@ -166,6 +174,18 @@ public class Grilla extends TilePane {
             return;
         }
         if (casillaResaltada != null) casillaResaltada.desResaltar();
+
+        Coordenada deltaCoordenada = getDeltaCoordenada(mouseEvent);
+        siguienteDireccion = sumarCoordenadas(tablero.getJugador().getPosicion(), deltaCoordenada);
+        casillaResaltada = obtenerCasilla(siguienteDireccion);
+        casillaResaltada.resaltar();
+
+    }
+
+    /**
+     * Devuelve la direccion del mouse respecto al jugador.
+     */
+    private Coordenada getDeltaCoordenada(MouseEvent mouseEvent) {
         int playerX = tablero.getJugador().getPosicion().getColumna();
         int playerY = tablero.getJugador().getPosicion().getFila();
 
@@ -180,48 +200,20 @@ public class Grilla extends TilePane {
 
         int deltaX = gridX - playerX;
         int deltaY = gridY - playerY;
-        Coordenada siguiente = new Coordenada(playerY, playerY);
 
-        if (deltaX != 0 && deltaY != 0 && Math.abs(deltaX) == Math.abs(deltaY)) {
-            // Movimiento diagonal
-            if (deltaX > 0 && deltaY > 0) {
-                siguiente.setFila(playerY+1); siguiente.setColumna(playerX+1);
-                siguienteDireccion = Direccion.ABAJO_DERECHA;
-            } else if (deltaX > 0) {
-                siguiente.setFila(playerY-1); siguiente.setColumna(playerX+1);
-                siguienteDireccion = Direccion.ARRIBA_DERECHA;
-            } else if (deltaY > 0) {
-                siguiente.setFila(playerY+1); siguiente.setColumna(playerX-1);
-                siguienteDireccion = Direccion.ABAJO_IZQUIERDA;
-            } else {
-                siguiente.setFila(playerY-1); siguiente.setColumna(playerX-1);
-                siguienteDireccion = Direccion.ARRIBA_IZQUIERDA;
-            }
-        } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            // Movimiento horizontal
-            if (deltaX > 0) {
-                siguiente.setFila(playerY); siguiente.setColumna(playerX+1);
-                siguienteDireccion = Direccion.DERECHA;
-            } else {
-                siguiente.setFila(playerY); siguiente.setColumna(playerX-1);
-                siguienteDireccion = Direccion.IZQUIERDA;
-            }
-        } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
-            // Movimiento vertical
-            if (deltaY > 0) {
-                siguiente.setFila(playerY+1); siguiente.setColumna(playerX);
-                siguienteDireccion = Direccion.ABAJO;
-            } else {
-                siguiente.setFila(playerY-1); siguiente.setColumna(playerX);
-                siguienteDireccion = Direccion.ARRIBA;
-            }
-        } else {
-            siguiente = tablero.getJugador().getPosicion();
-            siguienteDireccion = Direccion.PERMANECER;
-        }
-        casillaResaltada = obtenerCasilla(siguiente);
-        casillaResaltada.resaltar();
+        return new Coordenada((int)Math.signum(deltaY), (int)Math.signum(deltaX));
+    }
 
+    /**
+     * @param c1 (a, b)
+     * @param c2 (c, d)
+     * @return Coordenada(a + c, b + d)
+     */
+    private Coordenada sumarCoordenadas(Coordenada c1, Coordenada c2) {
+        int nuevaFila = c1.getFila() + c2.getFila();
+        int nuevaColumna = c1.getColumna() + c2.getColumna();
+
+        return new Coordenada(nuevaFila, nuevaColumna);
     }
 
 }

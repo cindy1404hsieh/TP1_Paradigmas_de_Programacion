@@ -3,12 +3,15 @@ package org.example.modelo;
 public abstract class Robot {
 
     private Coordenada posicion;
+
     public Robot(Coordenada posicion) {
         this.posicion = posicion;
     }
+
     /*es implementado por las subclases
     para definir cómo se mueve el robot en el tablero.*/
     public abstract Coordenada mover(Tablero tablero);
+
     /*mueve el robot hacia la posicion del jugador en el tablero,
     avanzando un numero especificado de pasos.
     calcula la direccion de movimiento comparando la posicion del jugador
@@ -26,11 +29,14 @@ public abstract class Robot {
 
         return new Coordenada(nuevaFila, nuevaColumna);
     }
+
     public abstract String getTipo();
+
     /*devuelve la posicion actual del robot.*/
     public Coordenada getPosicion() {
         return posicion;
     }
+
     public void setPosicion(Coordenada nuevaPosicion) {
         posicion = nuevaPosicion;
     }

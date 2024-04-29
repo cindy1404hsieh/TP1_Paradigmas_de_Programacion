@@ -19,6 +19,7 @@ public class Celda {
         OCUPADA,
         INCENDIADA
     }
+
     public Estado getEstado() {
         return estado;
     }

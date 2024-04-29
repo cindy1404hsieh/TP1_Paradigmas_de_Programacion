@@ -17,6 +17,7 @@ public class CeldaSeleccionadaEvent extends Event {
     public int getI() {
         return i;
     }
+
     public int getJ() {
         return j;
     }

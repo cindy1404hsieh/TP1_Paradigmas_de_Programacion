@@ -16,6 +16,7 @@ public enum Direccion {
     Direccion(int fila, int columna) {
         this.movimiento = new Coordenada(fila, columna);
     }
+
     public Coordenada getMovimiento() {
         return movimiento;
     }

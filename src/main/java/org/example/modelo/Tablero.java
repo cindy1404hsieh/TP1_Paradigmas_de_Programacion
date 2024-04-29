@@ -126,7 +126,7 @@ public class Tablero {
         Celda celdaJugador = getCelda(jugador.getPosicion());
         if (celdaJugador != null && celdaJugador.isIncendiada()) {
             jugadorEstaVivo = false;
-        }else{
+        } else {
             for (Robot robot : robots) {
                 if (getCelda(robot.getPosicion()) == celdaJugador) {
                     jugadorEstaVivo = false;
