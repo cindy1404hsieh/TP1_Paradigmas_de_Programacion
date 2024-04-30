@@ -14,11 +14,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.example.modelo.Coordenada;
 import org.example.modelo.Direccion;
 import org.example.modelo.Tablero;
 
+import java.awt.*;
 import java.util.*;
 
 public class Vista {
@@ -37,13 +39,17 @@ public class Vista {
     private final Tablero tablero;
     private final Grilla grilla;
     private final Stage stage;
+    private final Coordenada maxSize;
 
     public Vista(Stage stage) {
+
         this.stage = stage;
-        tablero = new Tablero(new Coordenada(10, 10), 1);
-        grilla = new Grilla(tablero);
+        this.tablero = new Tablero(new Coordenada(10, 10), 1);
+        this.grilla = new Grilla(tablero);
         HBox layoutSuperior = obtenerLayoutSuperior();
         HBox botones = obtenerBotones();
+
+
 
         safeTeleportRestante = new Label();
         HBox layoutInfo = new HBox(safeTeleportRestante);
@@ -66,11 +72,23 @@ public class Vista {
         stage.setScene(scene);
         stage.show();
 
+        // Debo esperar a que se muestre la pantalla para obtener altura de los panes.
+        maxSize = getMaxSize(layoutSuperior, botones, layoutInfo);
+
         stage.setOnHidden(e -> {
             pantallaFinDeJuego.close();
             System.exit(0);
         });
     }
+
+    private Coordenada getMaxSize(HBox layoutSuperior, HBox botones, HBox layoutInfo) {
+        int screenWidth = (int)(Screen.getPrimary().getVisualBounds().getWidth() / Grilla.LADO_CASILLA);
+        int screenHeigth = (int)((Screen.getPrimary().getVisualBounds().getHeight() - layoutSuperior.getHeight() - botones.getHeight() - layoutInfo.getHeight()) / Grilla.LADO_CASILLA);
+
+        // Debido a que la division no es exacta, le resto una casilla por las dudas.
+        return new Coordenada(screenHeigth - 1, screenWidth);
+    }
+
 
     /**
      * Inicializa el loop del juego.
@@ -142,8 +160,8 @@ public class Vista {
     public void cargarPantallaMenu(Event event) {
         TextField columnasTextfield = new TextField("10");
         TextField filasTextfield = new TextField("10");
-        Label maxTamanioLabel = new Label("Tamaño máx recomendado: 37x76 No te pases!");
-        HBox root = new HBox(new Label("Filas"), filasTextfield, new Label("Columnas"), columnasTextfield, maxTamanioLabel);
+        Label maxTamanioLabel = new Label(String.format("Advertencia: tamaños superiores a %d X %d pueden generar errores", maxSize.getFila(), maxSize.getColumna()));
+        HBox root = new HBox(new Label("Filas"), filasTextfield, new Label("Columnas"), columnasTextfield);
         Button okButton = new Button("Aceptar");
         Stage menuStage = new Stage();
 
@@ -158,7 +176,7 @@ public class Vista {
             this.stage.sizeToScene();
         });
 
-        menuStage.setScene(new Scene(new VBox(root, okButton)));
+        menuStage.setScene(new Scene(new VBox(root, maxTamanioLabel, okButton)));
         menuStage.setTitle("Ajustar tamaño");
         menuStage.initModality(Modality.WINDOW_MODAL);
         menuStage.initOwner(((Node) event.getSource()).getScene().getWindow());
