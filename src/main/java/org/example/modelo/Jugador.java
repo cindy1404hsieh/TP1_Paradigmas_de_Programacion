@@ -1,7 +1,5 @@
 package org.example.modelo;
 
-import java.util.Map;
-
 public class Jugador {
     private Coordenada posicion;
     private int teletransportacionesDisponibles;

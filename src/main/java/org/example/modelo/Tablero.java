@@ -189,10 +189,6 @@ public class Tablero {
         return coordenada.getFila() >= 0 && coordenada.getFila() < celdas.length && coordenada.getColumna() >= 0 && coordenada.getColumna() < celdas[0].length;
     }
 
-    /*    public boolean esCeldaLibre(Coordenada coordenada) {
-            Celda celda = getCelda(coordenada);
-            return celda != null && celda.getEstado() == Celda.Estado.LIBRE;
-        }*/
     /*Devuelve la celda en la coordenada especificada si es válida.*/
     public Celda getCelda(Coordenada coordenada) {
         if (esCeldaValida(coordenada)) {

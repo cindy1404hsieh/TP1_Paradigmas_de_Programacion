@@ -49,8 +49,6 @@ public class Vista {
         HBox layoutSuperior = obtenerLayoutSuperior();
         HBox botones = obtenerBotones();
 
-
-
         safeTeleportRestante = new Label();
         HBox layoutInfo = new HBox(safeTeleportRestante);
         layoutInfo.setAlignment(Pos.CENTER);
@@ -89,7 +87,6 @@ public class Vista {
         return new Coordenada(screenHeigth - 1, screenWidth);
     }
 
-
     /**
      * Inicializa el loop del juego.
      */
@@ -118,15 +115,19 @@ public class Vista {
                     grilla.getChildren().clear();
                     grilla.dibujarGrilla();
                     grilla.dibujarEntidades();
+                    siguienteNivelAlert();
 
-                    Alert siguienteNivelAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                    siguienteNivelAlert.setTitle("Felicidades!");
-                    siguienteNivelAlert.setHeaderText("Pasaste al siguiente nivel");
-                    siguienteNivelAlert.setContentText(":)");
-                    siguienteNivelAlert.show();
                 }
             }
         }.start();
+    }
+
+    private void siguienteNivelAlert() {
+        Alert siguienteNivelAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        siguienteNivelAlert.setTitle("Felicidades!");
+        siguienteNivelAlert.setHeaderText("Pasaste al siguiente nivel");
+        siguienteNivelAlert.setContentText(":)");
+        siguienteNivelAlert.show();
     }
 
     /**
@@ -168,11 +169,7 @@ public class Vista {
         okButton.setOnAction(ignored -> {
             int columnas = Integer.parseInt(columnasTextfield.getText());
             int filas = Integer.parseInt(filasTextfield.getText());
-            tablero.cambiarTamanio(new Coordenada(filas, columnas));
-            grilla.getChildren().clear();
-            grilla.dibujarGrilla();
-            grilla.dibujarEntidades();
-            menuStage.close();
+            cambiarTamanioHandler(filas, columnas, menuStage);
             this.stage.sizeToScene();
         });
 
@@ -182,6 +179,22 @@ public class Vista {
         menuStage.initOwner(((Node) event.getSource()).getScene().getWindow());
         menuStage.setResizable(false);
         menuStage.show();
+    }
+
+    private void cambiarTamanioHandler(int filas, int columnas, Stage menuStage) {
+        Coordenada nuevaDimension = new Coordenada(filas, columnas);
+        if (filas > maxSize.getFila() || columnas > maxSize.getColumna()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setContentText("Tamaño superior a lo recomendado");
+            alert.show();
+            return;
+        }
+        tablero.cambiarTamanio(nuevaDimension);
+        grilla.getChildren().clear();
+        grilla.dibujarGrilla();
+        grilla.dibujarEntidades();
+        menuStage.close();
     }
 
     /**
@@ -215,7 +228,6 @@ public class Vista {
     /**
      * crea y devuelve la parte superior de la interfaz grafica.
      */
-
     private HBox obtenerLayoutSuperior() {
         nivelLabel = new Label();
         HBox layoutLabels = new HBox(nivelLabel);
